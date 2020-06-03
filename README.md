@@ -19,9 +19,18 @@ Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getra
 ## Stap 6: Training van het model
 In de laatste stap werd het model getraind.
 
+# Evaluatie
+Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak.
+
+# Praktische problemen
+Enkele belangrijke praktische problemen die ervaren werden tijdens het implementatieproces:
+  - Enorme vereist opslagcapaciteit voor de trainingsdata (videos+tekst)
+  - Zeer veel rekenkracht nodig (in termen van GPUs), in dit geval werd 1 Cloud Tesla V100 GPU gebruikt
+  - Batch size groot genoeg houden door technieken zoals gradient accumulation
+
 # Bronnen
 De belangrijkste bronnen zijn:
-
+  - VideoBERT paper: https://arxiv.org/pdf/1904.01766.pdf
   - HuggingFace: https://github.com/huggingface/transformers
   - I3D model: https://github.com/deepmind/kinetics-i3d
   - RevoScaleR: https://docs.microsoft.com/en-us/machine-learning-server/r-reference/revoscaler/revoscaler

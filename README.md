@@ -1,5 +1,5 @@
 # Code voor masterproef
-Deze repository bevat de code voor het project van mijn masterproef omtrent VideoBERT.
+Deze repository bevat de code voor het project van mijn masterproef omtrent VideoBERT. De code in deze repository is gebaseerd op code van https://github.com/huggingface/transformers.
 
 ## Stap 1: Verzameling van de trainingsdata
 In deze stap worden de videos en tekstannotaties verzameld uit de HowTo100M dataset. Het bestand ***stap1/ids.txt*** bevat alle ids van de 47470 videos die opgenomen werden in de trainingsdata. De annotaties kunnen worden geraadpleegd via https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/.

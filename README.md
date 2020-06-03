@@ -17,7 +17,7 @@ In deze stap worden de I3D kenmerken gegroeppeerd a.d.h.v. hïerarchische k-mean
 Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getrainde BERT model kan in ***Pytorch*** aangepast worden om rekening te houden met de nieuwe woordenschat.
 
 ## Stap 6: Training van het model
-In de laatste stap werd het model getraind.
+In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimenteerd met een model dat geen rekening houdt met de nieuwe voorgestelde aligneringstaak, alsook een model dat hier wel rekening mee houdt.
 
 # Evaluatie
 Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak.
@@ -27,6 +27,10 @@ Enkele belangrijke praktische problemen die ervaren werden tijdens het implement
   - Enorme vereist opslagcapaciteit voor de trainingsdata (videos+tekst)
   - Zeer veel rekenkracht nodig (in termen van GPUs), in dit geval werd 1 Cloud Tesla V100 GPU gebruikt
   - Batch size groot genoeg houden door technieken zoals gradient accumulation
+
+# Belangrijke bevindingen
+  - Performantie van het model blijkt redelijk afhankelijk te zijn van de gebruikte template zin, wat een mogelijke tekortkoming is
+  - De multimodale aard van het model lijkt wel degelijk een semantische correspondentie te leren tussen tekst en video (vergeleken met bv. alleen tekst) 
 
 # Bronnen
 De belangrijkste bronnen zijn:

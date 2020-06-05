@@ -22,6 +22,8 @@ In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimente
 # Evaluatie
 Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak. De lijsten voor de werkwoorden en zelfstandige naamwoorden kunnen worden teruggevonden in ***evaluatie/verbs.txt*** en ***evaluatie/nouns.txt***. Het bestand met de ground-truth YouCookII linguïstieke en visuele zinnen samen met de werkwoorden en zelfstandige naamwoorden kan worden teruggevonden op https://drive.google.com/file/d/1hxbiS3mrQdJLkXsPo23dwl4m-dnCMcfV/view?usp=sharing.
 
+![Evaluatie Resultaten Met Originele Template Zin](images/results-normal.png "Evaluatie Resultaten Met Originele Template Zin")
+
 # Praktische problemen
 Enkele belangrijke praktische problemen die ervaren werden tijdens het implementatieproces:
   - Enorme vereist opslagcapaciteit voor de trainingsdata (videos+tekst)

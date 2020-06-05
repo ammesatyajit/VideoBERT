@@ -11,7 +11,7 @@ In deze stap worden de videos getransformeerd door de frame rate aan te passen n
 De I3D kenmerken van de videos worden in deze stap geconstrueerd a.d.h.v. het I3D netwerk. De folder ***stap3/checkpoint*** bevat het originele Tensorflow checkpoint voor het I3D model.
 
 ## Stap 4: Clustering van de I3D kenmerken
-In deze stap worden de I3D kenmerken gegroeppeerd a.d.h.v. hïerarchische k-means. De beste resultaten werden bekomen wanneer ***k=12*** en ***h=4***.
+In deze stap worden de I3D kenmerken gegroeppeerd a.d.h.v. hïerarchische k-means. De beste resultaten werden bekomen wanneer ***k=12*** en ***h=4***. Het bestand dat de cluster centroids bevat kan worden teruggevonden op https://drive.google.com/file/d/1i1mDYTnY-3SIkehEDGT5ip_xj0wXIZOr/view?usp=sharing.
 
 ## Stap 5: BERT omvormen tot VideoBERT
 Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getrainde BERT model kan in ***Pytorch*** aangepast worden om rekening te houden met de nieuwe woordenschat.

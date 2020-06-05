@@ -67,7 +67,7 @@ def main():
     predictmode = 'cross-prior'
 
     import json
-    with open('final_val_youcook_with_visual_ids_captions.json', 'r') as fd:
+    with open('val_youcook_captions.json', 'r') as fd:
         data = json.load(fd)
 
         for nr, (id, val) in enumerate(data.items(), start=1):

@@ -52,6 +52,7 @@ Enkele belangrijke praktische problemen die ervaren werden tijdens het implement
 # Bronnen
 De belangrijkste bronnen zijn:
   - VideoBERT paper: https://arxiv.org/pdf/1904.01766.pdf
+  - Hierarchical k-means paper: https://www.andrew.cmu.edu/user/hgifford/projects/k_means.pdf
   - HuggingFace: https://github.com/huggingface/transformers
   - I3D model: https://github.com/deepmind/kinetics-i3d
   - RevoScaleR: https://docs.microsoft.com/en-us/machine-learning-server/r-reference/revoscaler/revoscaler

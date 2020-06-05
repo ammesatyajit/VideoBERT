@@ -14,7 +14,7 @@ De I3D kenmerken van de videos worden in deze stap geconstrueerd a.d.h.v. het I3
 In deze stap worden de I3D kenmerken gegroeppeerd a.d.h.v. hïerarchische k-means. De beste resultaten werden bekomen wanneer ***k=12*** en ***h=4***. Het bestand dat de cluster centroids bevat kan worden teruggevonden op https://drive.google.com/file/d/1i1mDYTnY-3SIkehEDGT5ip_xj0wXIZOr/view?usp=sharing.
 
 ## Stap 5: BERT omvormen tot VideoBERT
-Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getrainde BERT model kan in ***Pytorch*** aangepast worden om rekening te houden met de nieuwe woordenschat.
+Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getrainde BERT model kan in ***Pytorch*** aangepast worden om rekening te houden met de nieuwe woordenschat. Bovendien werd er ook een nieuwe klasse ***VideoBertForPreTraining*** geconstrueerd om de trainingsregimes en inputmodaliteiten te realiseren.
 
 ## Stap 6: Training van het model
 In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimenteerd met een model dat geen rekening houdt met de nieuwe voorgestelde aligneringstaak, alsook een model dat hier wel rekening mee houdt. De verwerkte trainingsdata kan worden geraadpleegd via https://drive.google.com/file/d/1nlXQuRdzpsF9V95D8zPOnZz5miOw3FpV/view?usp=sharing.

@@ -12,7 +12,6 @@ class VideoBertDataset(Dataset):
     def __init__(self, tokenizer, data_path):
         self.data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), data_path)
         self.data = np.load(self.data_path, allow_pickle=True).item()
-        self.new_data_generator = self.get_new_data()
         self.tokenizer = tokenizer
         self.total_items = self.count()
         print('total items:', self.total_items)
@@ -160,7 +159,6 @@ class VideoBertDataset(Dataset):
 
         if max_token_len > 0:
             if (len(text_sentence) + len(video_sentence)) > max_token_len:
-               #print('truncating JOINT...')
                num_tokens_to_remove = (len(text_sentence) + len(video_sentence)) - max_token_len
                first, second, _ = self.tokenizer.truncate_sequences(ids=text_sentence, pair_ids=video_sentence, num_tokens_to_remove=num_tokens_to_remove)
                text_sentence = first
@@ -257,7 +255,6 @@ class VideoBertDataset(Dataset):
             for t, v in zip(text_items, video_items):
                 self.items[i] = (t, v, start_boundary_index, end_boundary_index)
                 i += 1
-        #print("i:", i)
 
     def count(self):
         total = 0
@@ -265,18 +262,10 @@ class VideoBertDataset(Dataset):
             total += len(val['text'])  # adjust for last item, has no natural follow-up
         return total
 
-    def get_new_data(self):
-        #print('getting next...')
-        for id, val in self.data.items():
-            #print("next:", id)
-            yield val
-
     def __len__(self):
         return self.total_items
 
     def __getitem__(self, i):
-        # We’ll pad at the batch level.
-        #print(i)
         text_sentence, text_label, text_token_type_ids = self.create_next_sentence_pair(i, 'text', max_token_len=37)
         video_sentence, video_label, video_token_type_ids = self.create_next_sentence_pair(i, 'video', max_token_len=37)
         # joint_sentence, joint_label, joint_token_type_ids = self.create_joint_sentence(i, max_token_len=37)

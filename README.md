@@ -20,7 +20,7 @@ Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getra
 In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimenteerd met een model dat geen rekening houdt met de nieuwe voorgestelde aligneringstaak, alsook een model dat hier wel rekening mee houdt.
 
 # Evaluatie
-Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak.
+Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak. De lijsten voor de werkwoorden en zelfstandige naamwoorden kunnen worden teruggevonden in ***evaluatie/verbs.txt*** en ***evaluatie/nouns.txt***
 
 # Praktische problemen
 Enkele belangrijke praktische problemen die ervaren werden tijdens het implementatieproces:

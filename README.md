@@ -30,6 +30,15 @@ Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het
 
 ![Evaluatie Resultaten Met Aangepaste Template Zin](images/results-custom.png "Evaluatie Resultaten Met Aangepaste Template Zin")
 
+### Kwalitatieve Resultaten
+
+#### Tekst-naar-Video taak
+![Tekst naar Video](images/text2video.png "Kwalitatieve Resultaten voor de Tekst-naar-Video taak")
+
+#### Video-naar-Tekst taak
+![Tekst naar Video](images/video2text.png "Kwalitatieve Resultaten voor de Video-naar-Tekst taak")
+
+
 # Praktische problemen
 Enkele belangrijke praktische problemen die ervaren werden tijdens het implementatieproces:
   - Enorme vereist opslagcapaciteit voor de trainingsdata (videos+tekst)

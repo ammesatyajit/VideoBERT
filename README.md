@@ -17,7 +17,7 @@ In deze stap worden de I3D kenmerken gegroeppeerd a.d.h.v. hïerarchische k-mean
 Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getrainde BERT model kan in ***Pytorch*** aangepast worden om rekening te houden met de nieuwe woordenschat.
 
 ## Stap 6: Training van het model
-In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimenteerd met een model dat geen rekening houdt met de nieuwe voorgestelde aligneringstaak, alsook een model dat hier wel rekening mee houdt.
+In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimenteerd met een model dat geen rekening houdt met de nieuwe voorgestelde aligneringstaak, alsook een model dat hier wel rekening mee houdt. De verwerkte trainingsdata kan worden geraadpleegd via https://drive.google.com/file/d/1nlXQuRdzpsF9V95D8zPOnZz5miOw3FpV/view?usp=sharing.
 
 # Evaluatie
 Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak. De lijsten voor de werkwoorden en zelfstandige naamwoorden kunnen worden teruggevonden in ***evaluatie/verbs.txt*** en ***evaluatie/nouns.txt***. Het bestand met de ground-truth YouCookII linguïstieke en visuele zinnen samen met de werkwoorden en zelfstandige naamwoorden kan worden teruggevonden op https://drive.google.com/file/d/1hxbiS3mrQdJLkXsPo23dwl4m-dnCMcfV/view?usp=sharing.

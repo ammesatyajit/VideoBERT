@@ -18,7 +18,7 @@ vis_lin_glue_token_id = bert_vocab_size + visual_vocab_size
 
 frozen_indices = torch.arange(bert_vocab_size, dtype=torch.int64)
 
-data_path = 'data/newest-data-max-len-25.npy'
+data_path = 'data/newest-data-max-len-20.npy'
 centers_file = 'data/centers.npy'
 
 config = BertConfig(

@@ -201,10 +201,6 @@ def main():
     print('nouns top 5:', nouns_top5_acc)
 
 
-else:
-    print('unknown mode:', mode)
-
-
 if __name__ == "__main__":
     main()
 

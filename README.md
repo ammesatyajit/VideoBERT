@@ -23,8 +23,8 @@ In the last step, the model was trained. They experimented with a model that doe
 The YouCookII validation dataset was used for the evaluation of the model. The trained model achieves similar results to the original model on a zero-shot classification task. The lists for the verbs and nouns can be found in evaluation / verbs.txt and evaluation / nouns.txt . The ground-truth YouCookII linguistic and visual sentences file along with the verbs and nouns can be found at https://drive.google.com/file/d/1hxbiS3mrQdJLkXsPo23dwl4m-dnCMcfV/view?usp=sharing .
 
 
-# Bronnen
-De belangrijkste bronnen zijn:
+# Sources
+The main sources are:
   - VideoBERT paper: https://arxiv.org/pdf/1904.01766.pdf
   - Hierarchical k-means paper: https://www.andrew.cmu.edu/user/hgifford/projects/k_means.pdf
   - HuggingFace: https://github.com/huggingface/transformers

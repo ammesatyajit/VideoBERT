@@ -1,53 +1,27 @@
-# Code voor masterproef
-Deze repository bevat de code voor het project van mijn masterproef omtrent VideoBERT. De code in deze repository is gebaseerd op code van https://github.com/huggingface/transformers.
+# VideoBERT
+This repository contains the code for the project of my master thesis about VideoBERT. The code in this repository is based on code from https://github.com/huggingface/transformers .
 
-## Stap 1: Verzameling van de trainingsdata
-In deze stap worden de videos en tekstannotaties verzameld uit de HowTo100M dataset. Het bestand ***stap1/ids.txt*** bevat alle ids van de 47470 videos die opgenomen werden in de trainingsdata. De annotaties kunnen worden geraadpleegd via https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/.
+# Step 1: Collection of the training data
+In this step the videos and text annotations are collected from the HowTo100M dataset. The file step1 / ids.txt contains all ids of the 47470 videos that were included in the workout data. The annotations can be viewed at https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/ .
 
-## Stap 2: Transformatie van de data
-In deze stap worden de videos getransformeerd door de frame rate aan te passen naar 10 fps en aan de tekst interpunctie toe te voegen. Voor de tekst kunnen de getrainde modellen voor interpunctie worden geraadpleegd via https://drive.google.com/drive/folders/0B7BsN5f2F1fZQnFsbzJ3TWxxMms.
+# Step 2: Transformation of the data
+In this step, the videos are transformed by adjusting the frame rate to 10 fps and adding punctuation to the text. For the text, the trained punctuation models can be consulted at https://drive.google.com/drive/folders/0B7BsN5f2F1fZQnFsbzJ3TWxxMms .
 
-## Stap 3: Extractie van de I3D kenmerken
-De I3D kenmerken van de videos worden in deze stap geconstrueerd a.d.h.v. het I3D netwerk. De folder ***stap3/checkpoint*** bevat het originele Tensorflow checkpoint voor het I3D model.
+# Step 3: Extraction of the I3D characteristics
+The I3D characteristics of the videos are constructed in this step using the I3D network. The folder step3 / checkpoint contains the original Tensorflow checkpoint for the I3D model.
 
-## Stap 4: Clustering van de I3D kenmerken
-In deze stap worden de I3D kenmerken gegroeppeerd a.d.h.v. hïerarchische k-means. De beste resultaten werden bekomen wanneer ***k=12*** en ***h=4***. Het bestand dat de cluster centroids bevat kan worden teruggevonden op https://drive.google.com/file/d/1i1mDYTnY-3SIkehEDGT5ip_xj0wXIZOr/view?usp=sharing.
+# Step 4: Clustering the I3D features
+In this step the I3D features are grouped by hierarchical k-means. The best results were obtained when k = 12 and h = 4 . The file containing the cluster centroids can be found at https://drive.google.com/file/d/1i1mDYTnY-3SIkehEDGT5ip_xj0wXIZOr/view?usp=sharing .
 
-## Stap 5: BERT omvormen tot VideoBERT
-Het startpunt van VideoBERT is het BERT model. De ***state_dict*** van het getrainde BERT model kan in ***Pytorch*** aangepast worden om rekening te houden met de nieuwe woordenschat. Bovendien werd er ook een nieuwe klasse ***VideoBertForPreTraining*** geconstrueerd om de trainingsregimes en inputmodaliteiten te realiseren.
+# Step 5: Convert BERT to VideoBERT
+The starting point of VideoBERT is the BERT model. The state_dict of the trained BERT model can be adjusted in Pytorch to take into account the new vocabulary. In addition, a new class VideoBertForPreTraining was also constructed to realize the training regimes and input modalities .
 
-## Stap 6: Training van het model
-In de laatste stap werd het model getraind. Hierbij werd er zowel gëexperimenteerd met een model dat geen rekening houdt met de nieuwe voorgestelde aligneringstaak, alsook een model dat hier wel rekening mee houdt. De verwerkte trainingsdata kan worden geraadpleegd via https://drive.google.com/file/d/1nlXQuRdzpsF9V95D8zPOnZz5miOw3FpV/view?usp=sharing.
+# Step 6: Training the model
+In the last step, the model was trained. They experimented with a model that does not take into account the new proposed alignment task, as well as a model that does take this into account. The processed training data can be viewed at https://drive.google.com/file/d/1nlXQuRdzpsF9V95D8zPOnZz5miOw3FpV/view?usp=sharing .
 
-# Evaluatie
-Voor de evalutie van het model werd de YouCookII validatie dataset gebruikt. Het getrainde model behaald gelijkaardige resultaten als het oorspronkelijke model op een zero-shot classificatietaak. De lijsten voor de werkwoorden en zelfstandige naamwoorden kunnen worden teruggevonden in ***evaluatie/verbs.txt*** en ***evaluatie/nouns.txt***. Het bestand met de ground-truth YouCookII linguïstieke en visuele zinnen samen met de werkwoorden en zelfstandige naamwoorden kan worden teruggevonden op https://drive.google.com/file/d/1hxbiS3mrQdJLkXsPo23dwl4m-dnCMcfV/view?usp=sharing.
+# Evaluation
+The YouCookII validation dataset was used for the evaluation of the model. The trained model achieves similar results to the original model on a zero-shot classification task. The lists for the verbs and nouns can be found in evaluation / verbs.txt and evaluation / nouns.txt . The ground-truth YouCookII linguistic and visual sentences file along with the verbs and nouns can be found at https://drive.google.com/file/d/1hxbiS3mrQdJLkXsPo23dwl4m-dnCMcfV/view?usp=sharing .
 
-### Resultaten met Originele Template Zin
-
-![Evaluatie Resultaten Met Originele Template Zin](images/results-normal.png "Evaluatie Resultaten Met Originele Template Zin")
-
-### Resultaten met Aangepaste Template Zin
-
-![Evaluatie Resultaten Met Aangepaste Template Zin](images/results-custom.png "Evaluatie Resultaten Met Aangepaste Template Zin")
-
-### Kwalitatieve Resultaten
-
-#### Tekst-naar-Video taak
-![Tekst naar Video](images/text2video.png "Kwalitatieve Resultaten voor de Tekst-naar-Video taak")
-
-#### Video-naar-Tekst taak
-![Tekst naar Video](images/video2text.png "Kwalitatieve Resultaten voor de Video-naar-Tekst taak")
-
-
-# Praktische problemen
-Enkele belangrijke praktische problemen die ervaren werden tijdens het implementatieproces:
-  - Enorme vereist opslagcapaciteit voor de trainingsdata (videos+tekst)
-  - Zeer veel rekenkracht nodig (in termen van GPUs), in dit geval werd 1 Cloud Tesla V100 GPU gebruikt
-  - Batch size groot genoeg houden door technieken zoals gradient accumulation
-
-# Belangrijke bevindingen
-  - Performantie van het model blijkt redelijk afhankelijk te zijn van de gebruikte template zin, wat een mogelijke tekortkoming is
-  - De multimodale aard van het model lijkt wel degelijk een semantische correspondentie te leren tussen tekst en video (vergeleken met bv. alleen tekst)
 
 # Bronnen
 De belangrijkste bronnen zijn:

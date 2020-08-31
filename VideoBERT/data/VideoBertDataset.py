@@ -5,8 +5,7 @@ import torch
 import os
 import numpy as np
 import random
-import globals as globals
-
+import VideoBERT.data.globals as data_globals
 
 class VideoBertDataset(Dataset):
     def __init__(self, tokenizer, data_path):
@@ -116,7 +115,7 @@ class VideoBertDataset(Dataset):
         return torch.tensor(np.hstack([
             np.array(self.tokenizer.cls_token_id),
             np.array(text_sentence),
-            np.array(globals.vis_lin_glue_token_id),  # glue embedding id
+            np.array(data_globals.vis_lin_glue_token_id),  # glue embedding id
             np.array(video_sentence),
             np.array(self.tokenizer.sep_token_id)
         ]), dtype=torch.int64), torch.tensor(label, dtype=torch.int64), torch.tensor(np.hstack([
@@ -170,7 +169,7 @@ class VideoBertDataset(Dataset):
         return torch.tensor(np.hstack([
             np.array(self.tokenizer.cls_token_id),
             np.array(text_sentence),
-            np.array(globals.vis_lin_glue_token_id),  # glue embedding id
+            np.array(data_globals.vis_lin_glue_token_id),  # glue embedding id
             np.array(video_sentence),
             np.array(self.tokenizer.sep_token_id)
         ]), dtype=torch.int64), torch.tensor(label, dtype=torch.int64), torch.tensor(np.hstack([

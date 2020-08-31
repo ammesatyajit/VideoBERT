@@ -1,6 +1,6 @@
 import torch
 from transformers import BertForPreTraining
-import globals as globals
+import VideoBERT.data.globals as data_globals
 
 
 def get_bert_save_dict():
@@ -11,14 +11,14 @@ def get_bert_save_dict():
     if os.path.exists(state_path):
         state = torch.load(state_path)
     else:
-        model = BertForPreTraining.from_pretrained(globals.bert_model)
+        model = BertForPreTraining.from_pretrained(data_globals.bert_model)
         state = model.state_dict()
         # cache state
         torch.save(state, state_path)
     return state
 
 
-def create_video_bert_save_dict_from_bert(config, centers_file=globals.centers_file):
+def create_video_bert_save_dict_from_bert(config, centers_file=data_globals.centers_file):
     import numpy as np
 
     centroids = torch.tensor(np.load(centers_file), dtype=torch.float32)

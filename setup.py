@@ -14,7 +14,8 @@ setuptools.setup(
     url="https://github.com/ammesatyajit/VideoBERT",
     packages=setuptools.find_packages(),
     install_requires=[
-        "transformers"
+        "transformers",
+        "tensorboardX"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

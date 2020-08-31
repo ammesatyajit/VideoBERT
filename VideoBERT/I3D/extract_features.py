@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import os.path
-from model.I3DModel import I3DModel
+from VideoBERT.I3D.I3DModelWrapper import I3DModel
 
 
 batch_count = 20

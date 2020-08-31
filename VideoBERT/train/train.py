@@ -47,10 +47,10 @@ from transformers import (
     BertTokenizer,
 )
 
-import globals as globals
-from modeling_video_bert import VideoBertForPreTraining
-from model_utils import create_video_bert_save_dict_from_bert
-from VideoBertDataset import VideoBertDataset
+import VideoBERT.data.globals as data_globals
+from VideoBERT.train.modeling_video_bert import VideoBertForPreTraining
+from VideoBERT.train.model_utils import create_video_bert_save_dict_from_bert
+from VideoBERT.data.VideoBertDataset import VideoBertDataset
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -125,7 +125,7 @@ def mask_tokens(inputs: torch.Tensor, tokenizer: PreTrainedTokenizer, args) -> T
     ]
 
     # search for glue token [>]
-    glue_mask = (labels == globals.vis_lin_glue_token_id)
+    glue_mask = (labels == data_globals.vis_lin_glue_token_id)
     probability_matrix.masked_fill_(glue_mask, value=0.0)
 
     probability_matrix.masked_fill_(torch.tensor(special_tokens_mask, dtype=torch.bool), value=0.0)
@@ -141,7 +141,7 @@ def mask_tokens(inputs: torch.Tensor, tokenizer: PreTrainedTokenizer, args) -> T
 
     # 10% of the time, we replace masked input tokens with random word
     indices_random = torch.bernoulli(torch.full(labels.shape, 0.5)).bool() & masked_indices & ~indices_replaced
-    random_words = torch.randint(globals.total_vocab_size, labels.shape, dtype=torch.long)
+    random_words = torch.randint(data_globals.total_vocab_size, labels.shape, dtype=torch.long)
     inputs[indices_random] = random_words[indices_random]
 
     # The rest of the time (10% of the time) we keep the masked input tokens unchanged
@@ -386,7 +386,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                       'joint loss:', joint_loss.item())
 
                 # keep BERT embeddings frozen
-                model.bert.embeddings.word_embeddings.weight.grad[globals.frozen_indices] = 0
+                model.bert.embeddings.word_embeddings.weight.grad[data_globals.frozen_indices] = 0
 
                 optimizer.step()
                 scheduler.step()  # Update learning rate schedule
@@ -572,14 +572,14 @@ def main():
     set_seed(args)
 
     # setup tokenizer and model
-    tokenizer = BertTokenizer.from_pretrained(globals.bert_model)
+    tokenizer = BertTokenizer.from_pretrained(data_globals.bert_model)
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
         model = VideoBertForPreTraining.from_pretrained(
             pretrained_model_name_or_path=None,
-            state_dict=create_video_bert_save_dict_from_bert(globals.config),
-            config=globals.config
+            state_dict=create_video_bert_save_dict_from_bert(data_globals.config),
+            config=data_globals.config
         )
     else:
         # start from checkpoint
@@ -589,7 +589,7 @@ def main():
     print('WEIGHTS:')
     print(model.bert.embeddings.word_embeddings.weight)
 
-    centroids = np.load(globals.centers_file)
+    centroids = np.load(data_globals.centers_file)
     print('CENTROIDS:')
     print(centroids)
 
@@ -599,7 +599,7 @@ def main():
 
     # Training
     if args.do_train:
-        train_dataset = VideoBertDataset(tokenizer, data_path=globals.data_path)
+        train_dataset = VideoBertDataset(tokenizer, data_path=data_globals.data_path)
 
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)

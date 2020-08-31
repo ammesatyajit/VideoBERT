@@ -1,10 +1,10 @@
 import argparse
 import numpy as np
 import torch
-import globals as globals
+import VideoBERT.data.globals as data_globals
 from transformers import BertTokenizer, BertForPreTraining
-from modeling_video_bert import VideoBertForPreTraining
-from model_utils import create_video_bert_save_dict_from_bert
+from VideoBERT.train.modeling_video_bert import VideoBertForPreTraining
+from VideoBERT.train.model_utils import create_video_bert_save_dict_from_bert
 import random
 
 
@@ -32,14 +32,14 @@ def main():
     set_seed(args)
 
     # setup tokenizer and model
-    tokenizer = BertTokenizer.from_pretrained(globals.bert_model)
+    tokenizer = BertTokenizer.from_pretrained(data_globals.bert_model)
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
         model = VideoBertForPreTraining.from_pretrained(
             pretrained_model_name_or_path=None,
-            state_dict=create_video_bert_save_dict_from_bert(globals.config),
-            config=globals.config
+            state_dict=create_video_bert_save_dict_from_bert(data_globals.config),
+            config=data_globals.config
         )
     else:
         # start from checkpoint
@@ -49,7 +49,7 @@ def main():
     print('WEIGHTS:')
     print(model.bert.embeddings.word_embeddings.weight)
 
-    centroids = np.load(globals.centers_file)
+    centroids = np.load(data_globals.centers_file)
     print('CENTROIDS:')
     print(centroids)
 

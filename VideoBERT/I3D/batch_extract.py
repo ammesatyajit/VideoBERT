@@ -1,4 +1,4 @@
-import extract_features as i3d
+import VideoBERT.I3D.extract_features as i3d
 import os.path
 import argparse
 import pathlib

@@ -1,6 +1,0 @@
-setup.py
-VideoBERT/__init__.py
-VideoBERT_ammesatyajit.egg-info/PKG-INFO
-VideoBERT_ammesatyajit.egg-info/SOURCES.txt
-VideoBERT_ammesatyajit.egg-info/dependency_links.txt
-VideoBERT_ammesatyajit.egg-info/top_level.txt

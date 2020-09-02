@@ -6,7 +6,7 @@ import VideoBERT.data.globals as data_globals
 def get_bert_save_dict():
     import os
 
-    state_path = 'data/bert-large.pt'
+    state_path = data_globals.root_path + '/bert-large.pt'
 
     if os.path.exists(state_path):
         state = torch.load(state_path)

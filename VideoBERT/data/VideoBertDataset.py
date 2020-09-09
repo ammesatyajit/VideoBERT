@@ -81,7 +81,11 @@ class VideoBertDataset(Dataset):
                     label = 0 # temp aligned
                 else:
                     indices = [k for k in range(start_boundary_index, end_boundary_index + 1) if k != i and k != i+1]
-                    concat_index = random.choice(indices)
+                    try:
+                        concat_index = random.choice(indices)
+                    except:
+                        concat_index = 0
+                        print('bad')
                     text_index = [i, concat_index]
                     video_index = [i, concat_index]
                     label = 1 # not temp aligned

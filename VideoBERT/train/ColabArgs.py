@@ -28,7 +28,8 @@ class ColabArgs():
                  no_cuda=False,
                  overwrite_output_dir=False,
                  overwrite_cache=False,
-                 seed=42,):
+                 seed=42,
+                 device='cuda'):
         self.output_dir = output_dir
         self.model_type = model_type
         self.should_continue = should_continue
@@ -58,3 +59,4 @@ class ColabArgs():
         self.overwrite_output_dir = overwrite_output_dir
         self.overwrite_cache = overwrite_cache
         self.seed = seed
+        self.device=device

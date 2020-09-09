@@ -150,7 +150,7 @@ def mask_tokens(inputs: torch.Tensor, tokenizer: PreTrainedTokenizer, args) -> T
 
 def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
     """ Train the model """
-    # will graph summary of training and eval at the end of each epoch (i think)
+    # will graph summary of training and eval at the end of each epoch
     tb_writer = SummaryWriter()
 
     # Calculates the batch size for training given number of gpus and batch size for gpus

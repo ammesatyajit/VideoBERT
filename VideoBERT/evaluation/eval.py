@@ -14,17 +14,20 @@ def set_seed(args):
     torch.manual_seed(args.seed)
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def main(colab_args=None):
+    if colab_args:
+       args = colab_args
+    else:
+        parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "--model_name_or_path",
-        default=None,
-        type=str,
-        help="The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.",
-    )
-    parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
-    args = parser.parse_args()
+        parser.add_argument(
+            "--model_name_or_path",
+            default=None,
+            type=str,
+            help="The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.",
+        )
+        parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
+        args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args.device = device

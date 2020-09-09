@@ -21,6 +21,7 @@ frozen_indices = torch.arange(bert_vocab_size, dtype=torch.int64)
 root_path = '/content/drive/My Drive/VideoBERT'
 data_path = '/content/drive/My Drive/VideoBERT/newest-data-max-len-20.npy'
 centers_file = '/content/drive/My Drive/VideoBERT/centers.npy'
+val_youcook = '/content/drive/My Drive/VideoBERT/val_youcook_captions.json'
 
 config = BertConfig(
     vocab_size=total_vocab_size,

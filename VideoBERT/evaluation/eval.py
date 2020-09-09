@@ -70,7 +70,7 @@ def main(colab_args=None):
     predictmode = 'cross-prior'
 
     import json
-    with open('val_youcook_captions.json', 'r') as fd:
+    with open(data_globals.val_youcook, 'r') as fd:
         data = json.load(fd)
 
         for nr, (id, val) in enumerate(data.items(), start=1):

@@ -87,7 +87,6 @@ def main(colab_args=None):
                 vsent = an['video_ids']
 
                 vid_template = tokenizer.encode("[MASK] [MASK] [MASK] [MASK]", add_special_tokens=False)
-                print("vsent:", np.array(vsent)+30522)
 
                 if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
                     if predictmode == 'lang-prior':
@@ -113,7 +112,6 @@ def main(colab_args=None):
                         ]), dtype=torch.int64).unsqueeze(0)
 
                     print(input_ids)
-                    quit()
 
                     input_ids = input_ids.to(device)
 
@@ -159,9 +157,13 @@ def main(colab_args=None):
                         logits = prediction_scores[0, masked_index, :]
                         probs = logits.softmax(dim=0)
                         values, predictions = probs.topk(npreds)
+                        print(predictions)
 
-                        for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
-                            results[index].append(tokenizer.decode([p]))
+                        if predictmode != 'vid-prior':
+                            for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
+                                results[index].append(tokenizer.decode([p]))
+
+                    exit(1)
 
                     predicted_verbs = results[0][:5]
                     if predictmode == 'lang-prior':

@@ -81,12 +81,14 @@ def main(colab_args=None):
                 template_sent = "now let me show you how to [MASK] the [MASK]."
                 encoded = tokenizer.encode(template_sent, add_special_tokens=False)
 
-                vid_template = "[MASK] [MASK] [MASK] [MASK]"
-
                 verbs_nouns_filt = an['verbs_nouns_filtered']
                 verbs = verbs_nouns_filt['verbs']
                 nouns = verbs_nouns_filt['nouns']
                 vsent = an['video_ids']
+
+                vid_template = vsent[0].item() + ' ' + tokenizer.encode("[MASK] [MASK] [MASK] [MASK]", add_special_tokens=False)
+                print(vsent, '\n', vid_template)
+
 
                 if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
                     if predictmode == 'lang-prior':
@@ -111,7 +113,7 @@ def main(colab_args=None):
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
 
-                    exit(1)
+                    quit()
 
                     input_ids = input_ids.to(device)
 

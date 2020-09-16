@@ -111,7 +111,7 @@ def main(colab_args=None):
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
 
-                    print("vsent:", vsent+30522)
+                    print("vsent:", np.array(vsent)+30522)
 
                     input_ids = input_ids.to(device)
 

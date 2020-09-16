@@ -67,7 +67,7 @@ def main(colab_args=None):
 
     npreds = 5
 
-    predictmode = 'cross-prior'
+    predictmode = 'vid-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -81,6 +81,8 @@ def main(colab_args=None):
                 template_sent = "now let me show you how to [MASK] the [MASK]."
                 encoded = tokenizer.encode(template_sent, add_special_tokens=False)
 
+                vid_template = "[MASK] [MASK] [MASK] [MASK]"
+
                 verbs_nouns_filt = an['verbs_nouns_filtered']
                 verbs = verbs_nouns_filt['verbs']
                 nouns = verbs_nouns_filt['nouns']
@@ -93,6 +95,13 @@ def main(colab_args=None):
                             np.array(encoded),
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
+                    elif predictmode == 'vid-prior':
+                        input_ids = torch.tensor(np.hstack([
+                            np.array([101]),
+                            np.array(vsent) + 30522,
+                            np.array([102])
+                        ]), dtype=torch.int64).unsqueeze(0)
+                        print(input_ids.shape, '\n', input_ids)
                     else:
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
@@ -101,6 +110,8 @@ def main(colab_args=None):
                             np.array(vsent) + 30522,
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
+
+                    exit(1)
 
                     input_ids = input_ids.to(device)
 
@@ -114,6 +125,10 @@ def main(colab_args=None):
                     if predictmode == 'lang-prior':
                         outputs = model(
                             text_input_ids=input_ids,
+                        )
+                    elif predictmode == 'vid-prior':
+                        outputs = model(
+                            video_input_ids=input_ids
                         )
                     else:
                         outputs = model(

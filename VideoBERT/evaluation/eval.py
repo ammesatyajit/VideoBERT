@@ -86,7 +86,8 @@ def main(colab_args=None):
                 nouns = verbs_nouns_filt['nouns']
                 vsent = an['video_ids']
 
-                vid_template = tokenizer.encode("[MASK] [MASK] [MASK] [MASK]", add_special_tokens=False)
+                vid_template = np.array(vsent) + 30522
+                vid_template[2] = 103
 
                 if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
                     if predictmode == 'lang-prior':
@@ -98,8 +99,7 @@ def main(colab_args=None):
                     elif predictmode == 'vid-prior':
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
-                            np.array(vsent)[0] + 30522,
-                            np.array(vid_template),
+                            vid_template,
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
                     else:

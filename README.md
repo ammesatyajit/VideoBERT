@@ -1,5 +1,5 @@
 # VideoBERT
-This repository contains the code for the project of my master thesis about VideoBERT. The code in this repository is based on code from https://github.com/huggingface/transformers .
+This repo reproduces the results of VideoBERT. The code in this repository is based on code from https://github.com/MDSKUL/MasterProject.
 
 # Step 1: Collection of the training data
 In this step the videos and text annotations are collected from the HowTo100M dataset. The file step1 / ids.txt contains all ids of the 47470 videos that were included in the workout data. The annotations can be viewed at https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/ .

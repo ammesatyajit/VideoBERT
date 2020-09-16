@@ -157,12 +157,12 @@ def main(colab_args=None):
                         logits = prediction_scores[0, masked_index, :]
                         probs = logits.softmax(dim=0)
                         values, predictions = probs.topk(npreds)
-                        print(predictions, '\n\n')
+                        print(predictions)
 
                         if predictmode != 'vid-prior':
                             for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
                                 results[index].append(tokenizer.decode([p]))
-
+                    print('\n\n')
 
                     if predictmode != 'vid-prior':
                         predicted_verbs = results[0][:5]

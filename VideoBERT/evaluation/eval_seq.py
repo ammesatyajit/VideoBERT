@@ -138,8 +138,8 @@ def main(colab_args=None):
                             logits = prediction_scores[0, masked_index, :]
                             probs = logits.softmax(dim=0)
                             values, predictions = probs.topk(npreds)
-                            print(predictions)
-                            vid_template[masked_index-1] = predictions[0]
+                            print('prediction:', predictions)
+                            vid_template[masked_index-1] = int(predictions[0])
             exit(1)
 
 

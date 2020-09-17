@@ -162,7 +162,6 @@ def main(colab_args=None):
                         if predictmode != 'vid-prior':
                             for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
                                 results[index].append(tokenizer.decode([p]))
-                    print('\n\n')
 
                     if predictmode != 'vid-prior':
                         predicted_verbs = results[0][:5]
@@ -203,6 +202,9 @@ def main(colab_args=None):
                                     break
 
                             top_stats['nouns_top5'].append(nouns_top5)
+
+                    else:
+                        print('\n\n')
 
     verbs_top1 = np.array(top_stats['verbs_top1'])
     verbs_top5 = np.array(top_stats['verbs_top5'])

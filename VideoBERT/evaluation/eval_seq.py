@@ -87,7 +87,7 @@ def main(colab_args=None):
                 nouns = verbs_nouns_filt['nouns']
                 vsent = an['video_ids']
 
-                vid_template = [vsent[0] + 30522, vsent[1] + 30522]
+                vid_template = [vsent[0] + 30522]
 
                 if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
                     print("vsent:", np.array(vsent) + 30522)
@@ -140,7 +140,7 @@ def main(colab_args=None):
                             probs = logits.softmax(dim=0)
                             values, predictions = probs.topk(npreds)
                             print('prediction:', predictions)
-                            vid_template[masked_index-1] = int(predictions[0])
+                            vid_template[masked_index-1] = int(predictions[1])
             exit(1)
 
 

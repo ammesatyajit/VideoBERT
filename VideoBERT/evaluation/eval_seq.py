@@ -87,7 +87,7 @@ def main(colab_args=None):
                 nouns = verbs_nouns_filt['nouns']
                 vsent = an['video_ids']
 
-                vid_template = [vsent[0] + 30522]
+                vid_template = [vsent[0] + 30522, vsent[1] + 30522]
 
                 if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
                     print("vsent:", np.array(vsent) + 30522)

@@ -68,7 +68,7 @@ def main(colab_args=None):
     npreds = 5
 
     predictmode = 'vid-prior'
-    temp = 3
+    temp = 10
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:

@@ -68,6 +68,7 @@ def main(colab_args=None):
     npreds = 5
 
     predictmode = 'vid-prior'
+    temp = 3
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -135,7 +136,7 @@ def main(colab_args=None):
 
                         for index, masked_index in enumerate(mask_indices):
                             # print('mask index:', masked_index)
-                            logits = prediction_scores[0, masked_index, :]
+                            logits = prediction_scores[0, masked_index, :] / temp
                             probs = logits.softmax(dim=0)
                             values, predictions = probs.topk(npreds)
                             print('prediction:', predictions)

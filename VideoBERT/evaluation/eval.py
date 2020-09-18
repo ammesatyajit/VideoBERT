@@ -67,7 +67,7 @@ def main(colab_args=None):
 
     npreds = 5
 
-    predictmode = 'vid-prior'
+    predictmode = 'cross-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -110,8 +110,6 @@ def main(colab_args=None):
                             np.array(vsent) + 30522,
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
-
-                    print("vsent:", np.array(vsent)+30522)
 
                     input_ids = input_ids.to(device)
 
@@ -157,54 +155,48 @@ def main(colab_args=None):
                         logits = prediction_scores[0, masked_index, :]
                         probs = logits.softmax(dim=0)
                         values, predictions = probs.topk(npreds)
-                        print(predictions)
 
-                        if predictmode != 'vid-prior':
-                            for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
-                                results[index].append(tokenizer.decode([p]))
+                        for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
+                            results[index].append(tokenizer.decode([p]))
 
-                    if predictmode != 'vid-prior':
-                        predicted_verbs = results[0][:5]
-                        if predictmode == 'lang-prior':
-                            predicted_nouns = results[1][:5]
-                        else:
-                            predicted_nouns = results[1][1:]
-
-                        print('verbs:', verbs)
-                        print('predicted verbs:', predicted_verbs)
-
-                        print('nouns:', nouns)
-                        print('predicted nouns:', predicted_nouns)
-                        print('')
-
-                        if len(verbs) > 0:
-                            top_stats['verbs_top1'].append(predicted_verbs[0] in verbs)
-
-                        if len(nouns) > 0:
-                            top_stats['nouns_top1'].append(predicted_nouns[0] in nouns)
-
-                        if len(verbs) > 0:
-                            verbs_top5 = False
-
-                            for v in predicted_verbs:
-                                if v in verbs:
-                                    verbs_top5 = True
-                                    break
-
-                            top_stats['verbs_top5'].append(verbs_top5)
-
-                        if len(nouns) > 0:
-                            nouns_top5 = False
-
-                            for n in predicted_nouns:
-                                if n in nouns:
-                                    nouns_top5 = True
-                                    break
-
-                            top_stats['nouns_top5'].append(nouns_top5)
-
+                    predicted_verbs = results[0][:5]
+                    if predictmode == 'lang-prior':
+                        predicted_nouns = results[1][:5]
                     else:
-                        print('\n\n')
+                        predicted_nouns = results[1][1:]
+
+                    print('verbs:', verbs)
+                    print('predicted verbs:', predicted_verbs)
+
+                    print('nouns:', nouns)
+                    print('predicted nouns:', predicted_nouns)
+                    print('')
+
+                    if len(verbs) > 0:
+                        top_stats['verbs_top1'].append(predicted_verbs[0] in verbs)
+
+                    if len(nouns) > 0:
+                        top_stats['nouns_top1'].append(predicted_nouns[0] in nouns)
+
+                    if len(verbs) > 0:
+                        verbs_top5 = False
+
+                        for v in predicted_verbs:
+                            if v in verbs:
+                                verbs_top5 = True
+                                break
+
+                        top_stats['verbs_top5'].append(verbs_top5)
+
+                    if len(nouns) > 0:
+                        nouns_top5 = False
+
+                        for n in predicted_nouns:
+                            if n in nouns:
+                                nouns_top5 = True
+                                break
+
+                        top_stats['nouns_top5'].append(nouns_top5)
 
     verbs_top1 = np.array(top_stats['verbs_top1'])
     verbs_top5 = np.array(top_stats['verbs_top5'])

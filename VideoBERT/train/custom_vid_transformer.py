@@ -1,6 +1,7 @@
 from transformers import BertForPreTraining, BertModel, BertForMaskedLM
 from transformers.modeling_bert import BertPreTrainingHeads, BertOnlyMLMHead
 import torch
+from torch import nn
 
 
 class VideoBertOnlyMLMHead(BertOnlyMLMHead):
@@ -132,3 +133,13 @@ class VideoBertForPreTraining(BertForPreTraining):
             outputs = (total_loss, text_loss, video_loss, joint_loss,) + outputs
 
         return outputs
+
+
+class VideoTransformer(nn.Module):
+    def __init__(self, config):
+        self.config = config
+        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act)
+
+    def froward(self, seq):
+        # seq - [batch_size, seq_len]
+        print(self.transformer(seq, seq).shape)

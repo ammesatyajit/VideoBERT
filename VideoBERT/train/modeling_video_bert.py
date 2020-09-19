@@ -86,8 +86,6 @@ class VideoBertForPreTraining(BertForPreTraining):
             )
 
             outputs += (text_prediction_scores, text_seq_relationship_score)
-            print("text_input_ids shape:", text_input_ids.shape)
-            print("text_prediction_scores shape:", text_prediction_scores.shape)
 
             if text_masked_lm_labels is not None and text_next_sentence_label is not None:
                 loss_fct = torch.nn.CrossEntropyLoss()

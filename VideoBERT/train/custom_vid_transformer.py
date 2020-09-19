@@ -154,8 +154,9 @@ class VideoTransformer(nn.Module):
     def forward(self, seq):
         # seq - [batch_size, seq_len]
         pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
-        print(any(torch.isnan(self.pos_encoding(pos)).view(-1)))
-        seq = (self.dropout((self.tok_embed(seq) * self.scale) + self.pos_encoding(pos))).transpose(0, 1)
+        seq = self.dropout((self.tok_embed(seq) * self.scale) + self.pos_encoding(pos))
+        print(any(torch.isnan(seq).view(-1)))
+        seq = seq.transpose(0, 1)
         out = self.transformer(seq, seq).transpose(0, 1)
         print(seq, '\n', out)
         return self.fc_out(out)

@@ -141,6 +141,6 @@ class VideoTransformer(nn.Module):
         self.config = config
         self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act)
 
-    def froward(self, seq):
+    def forward(self, seq):
         # seq - [batch_size, seq_len]
         print(self.transformer(seq, seq).shape)

@@ -137,6 +137,7 @@ class VideoBertForPreTraining(BertForPreTraining):
 
 class VideoTransformer(nn.Module):
     def __init__(self, config):
+        super().__init__()
         self.config = config
         self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act)
 

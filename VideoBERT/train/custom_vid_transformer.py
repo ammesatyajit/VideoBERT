@@ -136,15 +136,16 @@ class VideoBertForPreTraining(BertForPreTraining):
 
 
 class VideoTransformer(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, args):
         super().__init__()
         self.config = config
+        self.args = args
 
         self.tok_embed = nn.Embedding(self.config.vocab_size, self.config.hidden_size)
         self.pos_encoding = nn.Embedding(100, self.config.hidden_size)
 
         self.dropout = nn.Dropout(0.1)
-        self.scale = torch.sqrt(torch.FloatTensor(self.config.hidden_size))
+        self.scale = torch.sqrt(torch.FloatTensor(self.config.hidden_size)).to(self.args.device)
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
 
@@ -152,7 +153,8 @@ class VideoTransformer(nn.Module):
 
     def forward(self, seq):
         # seq - [batch_size, seq_len]
-        pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1)
+        pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
         seq = self.dropout((self.tok_embed(seq) * self.scale) + self.pos_encoding(pos)).transpose(0, 1)
         out = self.transformer(seq, seq).transpose(0, 1)
+        print(pos, '\n', seq, '\n', out)
         return self.fc_out(out)

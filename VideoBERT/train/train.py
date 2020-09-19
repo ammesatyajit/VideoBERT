@@ -308,7 +308,6 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             text_seq_labels = batch[1]
             text_token_type_ids = batch[2]
             text_attention_masks = batch[3]
-            print(text_attention_masks)
 
             video_ids = batch[4]
             video_seq_labels = batch[5]

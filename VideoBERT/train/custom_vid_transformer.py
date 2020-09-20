@@ -74,6 +74,7 @@ class VideoBertForPreTraining(BertForPreTraining):
         video_next_sentence_label=None,
         joint_vis_lin_label=None,
     ):
+        print(text_token_type_ids, '\n', video_token_type_ids, '\n', joint_token_type_ids)
         outputs = ()
         text_loss = None
         video_loss = None
@@ -151,17 +152,89 @@ class VideoTransformer(nn.Module):
 
         self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act)
 
-    def forward(self, seq):
-        # seq - [batch_size, seq_len]
-        mask = self._generate_square_subsequent_mask(seq.shape[1]).to(self.args.device)
-        print(mask)
-        pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
-        seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos)
-        seq = seq.transpose(0, 1)
-        out = self.transformer(seq, seq).transpose(0, 1)
-        return self.fc_out(out)
+    def forward(
+        self,
+        text_input_ids=None,
+        video_input_ids=None,
+        joint_input_ids=None,
+
+        text_token_type_ids=None,
+        video_token_type_ids=None,
+        joint_token_type_ids=None,
+
+        text_attention_mask=None,
+        video_attention_mask=None,
+        joint_attention_mask=None,
+    ):
+
+        outputs = ()
+        text_loss = None
+        video_loss = None
+        joint_loss = None
+
+        if text_input_ids is not None:
+            text_mask = self._generate_square_subsequent_mask(text_input_ids.shape[1]).to(self.args.device)
+            text_out = self.get_outputs(
+                seq=text_input_ids[:, -1],
+                attn_mask=text_mask,
+                key_pad_mask=text_attention_mask,
+            )
+
+            outputs += text_out
+
+            if self.args.do_train:
+                loss_fct = torch.nn.CrossEntropyLoss()
+                text_loss = loss_fct(text_out.view(-1, self.config.vocab_size), text_input_ids[:, 1:].view(-1))
+
+        if video_input_ids is not None:
+            vid_mask = self._generate_square_subsequent_mask(video_input_ids.shape[1]).to(self.args.device)
+            vid_out = self.get_outputs(
+                seq=video_input_ids[:, -1],
+                attn_mask=vid_mask,
+                key_pad_mask=video_attention_mask,
+            )
+
+            outputs += vid_out
+
+            if self.args.do_train:
+                loss_fct = torch.nn.CrossEntropyLoss()
+                text_loss = loss_fct(vid_out.view(-1, self.config.vocab_size), video_input_ids[:, 1:].view(-1))
+
+        if joint_input_ids is not None:
+            joint_mask = self._generate_square_subsequent_mask(joint_input_ids.shape[1]).to(self.args.device)
+            joint_out = self.get_outputs(
+                seq=joint_input_ids[:, -1],
+                attn_mask=joint_mask,
+                key_pad_mask=joint_attention_mask,
+            )
+
+            outputs += joint_out
+
+            if self.args.do_train:
+                loss_fct = torch.nn.CrossEntropyLoss()
+                text_loss = loss_fct(joint_out.view(-1, self.config.vocab_size), joint_input_ids[:, 1:].view(-1))
+
+        if text_loss is not None and video_loss is not None and joint_loss is not None:
+            total_loss = (text_loss + video_loss + joint_loss) / 3.0
+            outputs = (total_loss, text_loss, video_loss, joint_loss,) + outputs
+
+        return outputs
 
     def _generate_square_subsequent_mask(self, sz):
         mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
         mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
         return mask
+
+    def get_outputs(self, seq, attn_mask, key_pad_mask):
+        pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
+        seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos)
+        seq = seq.transpose(0, 1)
+        out = self.transformer(seq,
+                               seq,
+                               src_mask=attn_mask,
+                               tgt_mask=attn_mask,
+                               memory_mask=attn_mask,
+                               src_key_padding_mask=key_pad_mask,
+                               tgt_key_padding_mask=key_pad_mask,
+                               memory_key_padding_mask=key_pad_mask).transpose(0, 1)
+        return self.fc_out(out)

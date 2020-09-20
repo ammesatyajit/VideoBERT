@@ -4,7 +4,7 @@ class ColabArgs():
                  model_type,
                  should_continue=False,
                  model_name_or_path=None,
-                 mlm=True,
+                 mlm=False,
                  mlm_probability=0.15,
                  config_name=None,
                  tokenizer_name=None,

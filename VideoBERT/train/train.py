@@ -48,7 +48,7 @@ from transformers import (
 )
 
 import VideoBERT.data.globals as data_globals
-from VideoBERT.train.modeling_video_bert import VideoBertForPreTraining
+from VideoBERT.train.custom_vid_transformer import VideoBertForPreTraining, VideoTransformer
 from VideoBERT.train.model_utils import create_video_bert_save_dict_from_bert
 from VideoBERT.data.VideoBertDataset import VideoBertDataset
 
@@ -538,12 +538,6 @@ def main(colab_args=None):
         )
         parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
         args = parser.parse_args()
-
-    if args.model_type in ["bert", "roberta", "distilbert", "camembert"] and not args.mlm:
-        raise ValueError(
-            "BERT and RoBERTa-like models do not have LM heads but masked LM heads. They must be run using the --mlm "
-            "flag (masked language modeling)."
-        )
 
     if args.should_continue:
         sorted_checkpoints = _sorted_checkpoints(args)

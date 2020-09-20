@@ -49,7 +49,7 @@ from transformers import (
 
 import VideoBERT.data.globals as data_globals
 from VideoBERT.train.custom_vid_transformer import VideoBertForPreTraining, VideoTransformer
-from VideoBERT.train.model_utils import create_video_bert_save_dict_from_bert
+from VideoBERT.train.model_utils import *
 from VideoBERT.data.VideoBertDataset import VideoBertDataset
 
 try:
@@ -357,14 +357,6 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                 text_attention_mask=text_attention_masks,
                 video_attention_mask=video_attention_masks,
                 joint_attention_mask=joint_attention_masks,
-
-                text_masked_lm_labels=text_mask_labels,
-                video_masked_lm_labels=video_mask_labels,
-                joint_masked_lm_labels=joint_mask_labels,
-
-                text_next_sentence_label=text_seq_labels,
-                video_next_sentence_label=video_seq_labels,
-                joint_vis_lin_label=joint_labels,
             )
 
             loss = outputs[0]
@@ -390,9 +382,6 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                       'text loss:', text_loss.item(),
                       'video loss:', video_loss.item(),
                       'joint loss:', joint_loss.item())
-
-                # keep BERT embeddings frozen
-                model.bert.embeddings.word_embeddings.weight.grad[data_globals.frozen_indices] = 0
 
                 optimizer.step()
                 scheduler.step()  # Update learning rate schedule
@@ -579,18 +568,12 @@ def main(colab_args=None):
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
-        model = VideoBertForPreTraining.from_pretrained(
-            pretrained_model_name_or_path=None,
-            state_dict=create_video_bert_save_dict_from_bert(data_globals.config),
-            config=data_globals.config
-        )
+        model = VideoTransformer(config=data_globals.config, args=args)
+        model.apply(initialize_weights)
     else:
         # start from checkpoint
         print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
-        model = VideoBertForPreTraining.from_pretrained(args.model_name_or_path)
-
-    print('WEIGHTS:')
-    print(model.bert.embeddings.word_embeddings.weight)
+        model = VideoTransformer.from_pretrained(config=data_globals.config, args=args)
 
     centroids = np.load(data_globals.centers_file)
     print('CENTROIDS:')

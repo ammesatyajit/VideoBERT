@@ -1,5 +1,7 @@
 import torch
+import torch.nn as nn
 from transformers import BertForPreTraining
+
 import VideoBERT.data.globals as data_globals
 
 
@@ -60,3 +62,7 @@ def create_video_bert_save_dict_from_bert(config, centers_file=data_globals.cent
     video_bert_state['cls.vis_lin_align.bias'] = cls_vis_lin_align_bias
 
     return video_bert_state
+
+def initialize_weights(m):
+    if hasattr(m, 'weight') and m.weight.dim() > 1:
+        nn.init.xavier_uniform_(m.weight.data)

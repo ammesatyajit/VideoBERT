@@ -74,7 +74,6 @@ class VideoBertForPreTraining(BertForPreTraining):
         video_next_sentence_label=None,
         joint_vis_lin_label=None,
     ):
-        print(text_token_type_ids, '\n', video_token_type_ids, '\n', joint_token_type_ids)
         outputs = ()
         text_loss = None
         video_loss = None
@@ -144,6 +143,7 @@ class VideoTransformer(nn.Module):
 
         self.tok_embed = nn.Embedding(self.config.vocab_size, self.config.hidden_size)
         self.pos_encoding = nn.Embedding(100, self.config.hidden_size)
+        self.tok_type_embed = nn.Embedding(2, self.config.hidden_size)
 
         self.dropout = nn.Dropout(0.1)
         self.scale = torch.sqrt(torch.FloatTensor(self.config.hidden_size)).to(self.args.device)
@@ -176,6 +176,7 @@ class VideoTransformer(nn.Module):
             text_mask = self._generate_square_subsequent_mask(text_input_ids.shape[1]).to(self.args.device)
             text_out = self.get_outputs(
                 seq=text_input_ids[:, -1],
+                tok_type_ids=text_token_type_ids,
                 attn_mask=text_mask,
                 key_pad_mask=text_attention_mask,
             )
@@ -190,6 +191,7 @@ class VideoTransformer(nn.Module):
             vid_mask = self._generate_square_subsequent_mask(video_input_ids.shape[1]).to(self.args.device)
             vid_out = self.get_outputs(
                 seq=video_input_ids[:, -1],
+                tok_type_ids=video_token_type_ids,
                 attn_mask=vid_mask,
                 key_pad_mask=video_attention_mask,
             )
@@ -204,6 +206,7 @@ class VideoTransformer(nn.Module):
             joint_mask = self._generate_square_subsequent_mask(joint_input_ids.shape[1]).to(self.args.device)
             joint_out = self.get_outputs(
                 seq=joint_input_ids[:, -1],
+                tok_type_ids=joint_token_type_ids,
                 attn_mask=joint_mask,
                 key_pad_mask=joint_attention_mask,
             )
@@ -225,9 +228,9 @@ class VideoTransformer(nn.Module):
         mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
         return mask
 
-    def get_outputs(self, seq, attn_mask, key_pad_mask):
+    def get_outputs(self, seq, tok_type_ids, attn_mask, key_pad_mask):
         pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
-        seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos)
+        seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos) + self.tok_type_embed(tok_type_ids)
         seq = seq.transpose(0, 1)
         out = self.transformer(seq,
                                seq,
@@ -238,3 +241,8 @@ class VideoTransformer(nn.Module):
                                tgt_key_padding_mask=key_pad_mask,
                                memory_key_padding_mask=key_pad_mask).transpose(0, 1)
         return self.fc_out(out)
+
+    def from_pretrained(self, config, args):
+        model = VideoTransformer(config, args)
+        model.load_state_dict(torch.load(args.model_name_or_path + '/pytorch_model.bin'))
+        return model

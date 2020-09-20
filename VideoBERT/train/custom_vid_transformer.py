@@ -153,7 +153,7 @@ class VideoTransformer(nn.Module):
 
     def forward(self, seq):
         # seq - [batch_size, seq_len]
-        mask = self._generate_square_subsequent_mask(seq.shape[1])
+        mask = self._generate_square_subsequent_mask(seq.shape[1]).to(args.device)
         print(mask)
         pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
         seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos)

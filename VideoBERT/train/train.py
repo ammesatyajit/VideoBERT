@@ -348,13 +348,13 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             print(text_inputs, video_inputs)
 
             outputs = model(
-                text_input_ids=text_inputs,
-                video_input_ids=video_inputs,
-                joint_input_ids=joint_inputs,
+                text_input_ids=torch.LongTensor(text_inputs),
+                video_input_ids=torch.LongTensor(video_inputs),
+                joint_input_ids=torch.LongTensor(joint_inputs),
 
-                text_token_type_ids=text_token_type_ids,
-                video_token_type_ids=video_token_type_ids,
-                joint_token_type_ids=joint_token_type_ids,
+                text_token_type_ids=torch.LongTensor(text_token_type_ids),
+                video_token_type_ids=torch.LongTensor(video_token_type_ids),
+                joint_token_type_ids=torch.LongTensor(joint_token_type_ids),
 
                 text_attention_mask=text_attention_masks,
                 video_attention_mask=video_attention_masks,

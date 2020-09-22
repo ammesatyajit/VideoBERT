@@ -319,13 +319,11 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             joint_token_type_ids = batch[10]
             joint_attention_masks = batch[11]
 
-            text_inputs, text_mask_labels = mask_tokens(text_ids, tokenizer, args) if args.mlm else (text_ids, text_ids)
-            video_inputs, video_mask_labels = mask_tokens(video_ids, tokenizer, args) if args.mlm else (video_ids, video_ids)
-            joint_inputs, joint_mask_labels = mask_tokens(joint_ids, tokenizer, args) if args.mlm else (joint_ids, joint_ids)
+            text_inputs = torch.LongTensor(text_ids)
+            video_inputs = torch.LongTensor(video_ids)
+            joint_inputs = torch.LongTensor(joint_ids)
 
             text_inputs = text_inputs.to(args.device)
-            text_mask_labels = text_mask_labels.to(args.device)
-            text_seq_labels = text_seq_labels.to(args.device)
 
             text_token_type_ids = text_token_type_ids.to(args.device)
             video_token_type_ids = video_token_type_ids.to(args.device)
@@ -336,25 +334,21 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             joint_attention_masks = joint_attention_masks.to(args.device)
 
             video_inputs = video_inputs.to(args.device)
-            video_mask_labels = video_mask_labels.to(args.device)
-            video_seq_labels = video_seq_labels.to(args.device)
 
             joint_inputs = joint_inputs.to(args.device)
-            joint_mask_labels = joint_mask_labels.to(args.device)
-            joint_labels = joint_labels.to(args.device)
 
             model.train()
 
             print(text_inputs, video_inputs)
 
             outputs = model(
-                text_input_ids=torch.LongTensor(text_inputs),
-                video_input_ids=torch.LongTensor(video_inputs),
-                joint_input_ids=torch.LongTensor(joint_inputs),
+                text_input_ids=text_inputs,
+                video_input_ids=video_inputs,
+                joint_input_ids=joint_inputs,
 
-                text_token_type_ids=torch.LongTensor(text_token_type_ids),
-                video_token_type_ids=torch.LongTensor(video_token_type_ids),
-                joint_token_type_ids=torch.LongTensor(joint_token_type_ids),
+                text_token_type_ids=text_token_type_ids,
+                video_token_type_ids=video_token_type_ids,
+                joint_token_type_ids=joint_token_type_ids,
 
                 text_attention_mask=text_attention_masks,
                 video_attention_mask=video_attention_masks,

@@ -173,12 +173,12 @@ class VideoTransformer(nn.Module):
         joint_loss = None
 
         if text_input_ids is not None:
-            text_mask = self._generate_square_subsequent_mask(text_input_ids.shape[1]).to(self.args.device)
+            text_mask = self._generate_square_subsequent_mask(text_input_ids.shape[1]-1).to(self.args.device)
             text_out = self.get_outputs(
                 seq=text_input_ids[:, :-1],
-                tok_type_ids=text_token_type_ids,
+                tok_type_ids=text_token_type_ids[:, :-1],
                 attn_mask=text_mask,
-                key_pad_mask=text_attention_mask,
+                key_pad_mask=text_attention_mask[:, :-1],
             )
 
             outputs += text_out
@@ -188,12 +188,12 @@ class VideoTransformer(nn.Module):
                 text_loss = loss_fct(text_out.view(-1, self.config.vocab_size), text_input_ids[:, 1:].view(-1))
 
         if video_input_ids is not None:
-            vid_mask = self._generate_square_subsequent_mask(video_input_ids.shape[1]).to(self.args.device)
+            vid_mask = self._generate_square_subsequent_mask(video_input_ids.shape[1]-1).to(self.args.device)
             vid_out = self.get_outputs(
                 seq=video_input_ids[:, :-1],
-                tok_type_ids=video_token_type_ids,
+                tok_type_ids=video_token_type_ids[:, :-1],
                 attn_mask=vid_mask,
-                key_pad_mask=video_attention_mask,
+                key_pad_mask=video_attention_mask[:, :-1],
             )
 
             outputs += vid_out
@@ -203,12 +203,12 @@ class VideoTransformer(nn.Module):
                 text_loss = loss_fct(vid_out.view(-1, self.config.vocab_size), video_input_ids[:, 1:].view(-1))
 
         if joint_input_ids is not None:
-            joint_mask = self._generate_square_subsequent_mask(joint_input_ids.shape[1]).to(self.args.device)
+            joint_mask = self._generate_square_subsequent_mask(joint_input_ids.shape[1]-1).to(self.args.device)
             joint_out = self.get_outputs(
                 seq=joint_input_ids[:, :-1],
-                tok_type_ids=joint_token_type_ids,
+                tok_type_ids=joint_token_type_ids[:, :-1],
                 attn_mask=joint_mask,
-                key_pad_mask=joint_attention_mask,
+                key_pad_mask=joint_attention_mask[:, :-1],
             )
 
             outputs += joint_out

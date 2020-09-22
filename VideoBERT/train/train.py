@@ -319,9 +319,9 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             joint_token_type_ids = batch[10]
             joint_attention_masks = batch[11]
 
-            text_inputs = torch.LongTensor(text_ids)
-            video_inputs = torch.LongTensor(video_ids)
-            joint_inputs = torch.LongTensor(joint_ids)
+            text_inputs = torch.LongTensor(list(text_ids))
+            video_inputs = torch.LongTensor(list(video_ids))
+            joint_inputs = torch.LongTensor(list(joint_ids))
 
             text_inputs = text_inputs.to(args.device)
 
@@ -339,7 +339,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
             model.train()
 
-            print(text_inputs, video_inputs)
+            print(text_inputs.shape)
 
             outputs = model(
                 text_input_ids=text_inputs,

@@ -339,8 +339,6 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
 
             model.train()
 
-            print(text_inputs.shape)
-
             outputs = model(
                 text_input_ids=text_inputs,
                 video_input_ids=video_inputs,

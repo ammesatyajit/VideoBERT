@@ -185,6 +185,8 @@ class VideoTransformer(nn.Module):
 
             if self.args.do_train:
                 loss_fct = torch.nn.CrossEntropyLoss()
+                print(text_out.shape, self.config.vocab_size)
+                text_out = text_out.permute(2, 0, 1)
                 text_loss = loss_fct(text_out.view(-1, self.config.vocab_size), text_input_ids[:, 1:].view(-1))
 
         if video_input_ids is not None:

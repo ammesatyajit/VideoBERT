@@ -71,4 +71,4 @@ def initialize_weights(m):
 
 def contains_nan(tensor):
     bool_tensor = torch.isnan(tensor)
-    return any(bool_tensor)
+    return bool_tensor.any()

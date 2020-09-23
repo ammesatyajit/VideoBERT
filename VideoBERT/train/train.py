@@ -329,6 +329,11 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             video_token_type_ids = video_token_type_ids.to(args.device)
             joint_token_type_ids = joint_token_type_ids.to(args.device)
 
+            print(text_attention_masks)
+            text_attention_masks = text_attention_masks > 0
+            video_attention_masks = video_attention_masks > 0
+            joint_attention_masks = joint_attention_masks > 0
+
             text_attention_masks = text_attention_masks.to(args.device)
             video_attention_masks = video_attention_masks.to(args.device)
             joint_attention_masks = joint_attention_masks.to(args.device)

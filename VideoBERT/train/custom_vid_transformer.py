@@ -3,6 +3,8 @@ from transformers.modeling_bert import BertPreTrainingHeads, BertOnlyMLMHead
 import torch
 from torch import nn
 
+from VideoBERT.train.model_utils import contains_nan
+
 
 class VideoBertOnlyMLMHead(BertOnlyMLMHead):
     def __init__(self, config):
@@ -237,7 +239,7 @@ class VideoTransformer(nn.Module):
     def get_outputs(self, seq, tok_type_ids, attn_mask, key_pad_mask):
         pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
         seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos) + self.tok_type_embed(tok_type_ids)
-        print(seq)
+        print("seq:", contains_nan(seq))
         seq = seq.transpose(0, 1)
         out = self.transformer(seq,
                                seq,
@@ -247,7 +249,7 @@ class VideoTransformer(nn.Module):
                                src_key_padding_mask=key_pad_mask,
                                tgt_key_padding_mask=key_pad_mask,
                                memory_key_padding_mask=key_pad_mask).transpose(0, 1)
-        print(out)
+        print("out:", contains_nan(out))
         return self.fc_out(out)
 
     def from_pretrained(self, config, args):

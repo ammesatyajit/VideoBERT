@@ -63,6 +63,12 @@ def create_video_bert_save_dict_from_bert(config, centers_file=data_globals.cent
 
     return video_bert_state
 
+
 def initialize_weights(m):
     if hasattr(m, 'weight') and m.weight.dim() > 1:
         nn.init.xavier_uniform_(m.weight.data)
+
+
+def contains_nan(tensor):
+    bool_tensor = torch.isnan(tensor)
+    return any(bool_tensor)

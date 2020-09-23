@@ -167,7 +167,7 @@ class VideoTransformer(nn.Module):
         joint_attention_mask=None,
     ):
 
-        outputs = ()
+        outputs = []
         text_loss = None
         video_loss = None
         joint_loss = None
@@ -181,7 +181,7 @@ class VideoTransformer(nn.Module):
                 key_pad_mask=text_attention_mask[:, :-1],
             )
 
-            outputs += text_out
+            outputs.append(text_out)
 
             if self.args.do_train:
                 loss_fct = torch.nn.CrossEntropyLoss()
@@ -196,7 +196,7 @@ class VideoTransformer(nn.Module):
                 key_pad_mask=video_attention_mask[:, :-1],
             )
 
-            outputs += vid_out
+            outputs.append(vid_out)
 
             if self.args.do_train:
                 loss_fct = torch.nn.CrossEntropyLoss()
@@ -211,7 +211,7 @@ class VideoTransformer(nn.Module):
                 key_pad_mask=joint_attention_mask[:, :-1],
             )
 
-            outputs += joint_out
+            outputs.append(joint_out)
 
             if self.args.do_train:
                 loss_fct = torch.nn.CrossEntropyLoss()
@@ -219,7 +219,7 @@ class VideoTransformer(nn.Module):
 
         if text_loss is not None and video_loss is not None and joint_loss is not None:
             total_loss = (text_loss + video_loss + joint_loss) / 3.0
-            outputs = (total_loss, text_loss, video_loss, joint_loss,) + outputs
+            outputs = [total_loss, text_loss, video_loss, joint_loss].extend(outputs)
 
         return outputs
 

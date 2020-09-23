@@ -185,9 +185,10 @@ class VideoTransformer(nn.Module):
 
             if self.args.do_train:
                 loss_fct = torch.nn.CrossEntropyLoss()
-                print(text_out.shape, self.config.vocab_size)
-                text_out = text_out.permute(2, 0, 1)
-                text_loss = loss_fct(text_out.view(-1, self.config.vocab_size), text_input_ids[:, 1:].view(-1))
+                print(text_out.shape)
+                text_out = text_out.permute(2, 0, 1).view(self.config.vocab_size, -1).permute(1, 2, 0)
+                print(text_out.shape)
+                text_loss = loss_fct(text_out, text_input_ids[:, 1:].view(-1))
 
         if video_input_ids is not None:
             vid_mask = self._generate_square_subsequent_mask(video_input_ids.shape[1]-1).to(self.args.device)

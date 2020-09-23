@@ -225,7 +225,7 @@ class VideoTransformer(nn.Module):
 
         if text_loss is not None and video_loss is not None and joint_loss is not None:
             total_loss = (text_loss + video_loss + joint_loss) / 3.0
-            print(total_loss)
+            print(text_out, vid_out, joint_out)
             outputs = [total_loss, text_loss, video_loss, joint_loss, text_out, vid_out, joint_out]
 
         return outputs

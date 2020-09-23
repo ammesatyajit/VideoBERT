@@ -150,7 +150,7 @@ class VideoTransformer(nn.Module):
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
 
-        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act)
+        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act, dropout=0)
 
     def forward(
         self,

@@ -237,9 +237,11 @@ class VideoTransformer(nn.Module):
         return mask
 
     def get_outputs(self, seq, tok_type_ids, attn_mask, key_pad_mask):
-        pos = torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device)
-        seq = (self.tok_embed(seq) * self.scale) + self.pos_encoding(pos) + self.tok_type_embed(tok_type_ids)
-        print("seq:", contains_nan(seq))
+        pos = self.pos_encoding(torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device))
+        tok = self.tok_embed(seq) * self.scale
+        tok_type = self.tok_type_embed(tok_type_ids)
+        seq = tok + pos + tok_type
+        print("pos: {}\ntok: {}\ntok_type: {}\nseq: {}".format(contains_nan(pos), contains_nan(tok), contains_nan(tok_type), contains_nan(seq)))
         seq = seq.transpose(0, 1)
         out = self.transformer(seq,
                                seq,

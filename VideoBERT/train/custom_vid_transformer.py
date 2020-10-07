@@ -152,7 +152,7 @@ class VideoTransformer(nn.Module):
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
 
-        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act, dropout=0.1)
+        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act, dropout=0)
 
     def forward(
         self,
@@ -240,7 +240,7 @@ class VideoTransformer(nn.Module):
         pos = self.pos_encoding(torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device))
         tok = self.tok_embed(seq) * self.scale
         tok_type = self.tok_type_embed(tok_type_ids)
-        seq = self.dropout(tok + pos + tok_type)
+        seq = tok + pos + tok_type
         seq = seq.transpose(0, 1)
         out = self.transformer(seq,
                                seq,

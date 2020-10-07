@@ -152,7 +152,7 @@ class VideoTransformer(nn.Module):
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
 
-        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act, dropout=0)
+        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, activation=self.config.hidden_act, dropout=0.1)
 
     def forward(
         self,
@@ -240,8 +240,7 @@ class VideoTransformer(nn.Module):
         pos = self.pos_encoding(torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device))
         tok = self.tok_embed(seq) * self.scale
         tok_type = self.tok_type_embed(tok_type_ids)
-        seq = tok + pos + tok_type
-        print("pos: {}\ntok: {}\ntok_type: {}\nseq: {}".format(contains_nan(pos), contains_nan(tok), contains_nan(tok_type), contains_nan(seq)))
+        seq = self.dropout(tok + pos + tok_type)
         seq = seq.transpose(0, 1)
         out = self.transformer(seq,
                                seq,
@@ -251,7 +250,6 @@ class VideoTransformer(nn.Module):
                                src_key_padding_mask=key_pad_mask,
                                tgt_key_padding_mask=key_pad_mask,
                                memory_key_padding_mask=key_pad_mask).transpose(0, 1)
-        print("out:", contains_nan(out))
         return self.fc_out(out)
 
     def from_pretrained(self, config, args):

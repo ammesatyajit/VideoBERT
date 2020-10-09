@@ -241,6 +241,9 @@ class VideoTransformer(nn.Module):
         tok = self.tok_embed(seq) * self.scale
         tok_type = self.tok_type_embed(tok_type_ids)
         seq = tok + pos + tok_type
+        print("pos: {}\ntok: {}\ntok_type: {}".format(contains_nan(pos), contains_nan(tok), contains_nan(tok_type)))
+        if any([contains_nan(pos), contains_nan(tok), contains_nan(tok_type)]):
+            raise RuntimeError("One of pos, tok, or tok_type contains a nan")
         seq = seq.transpose(0, 1)
         out = self.transformer(seq,
                                seq,

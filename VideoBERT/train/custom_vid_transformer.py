@@ -149,6 +149,8 @@ class VideoTransformer(nn.Module):
 
         self.dropout = nn.Dropout(0.1)
         self.scale = torch.sqrt(torch.FloatTensor([self.config.hidden_size])).to(self.args.device)
+        assert len(self.scale.shape) == 1
+        assert contains_nan(self.scale).item() is False
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
 

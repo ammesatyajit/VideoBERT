@@ -148,7 +148,7 @@ class VideoTransformer(nn.Module):
         self.tok_type_embed = nn.Embedding(2, self.config.hidden_size)
 
         self.dropout = nn.Dropout(0.1)
-        self.scale = torch.sqrt(torch.FloatTensor(self.config.hidden_size)).to(self.args.device)
+        self.scale = torch.sqrt(torch.FloatTensor([self.config.hidden_size])).to(self.args.device)
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
 

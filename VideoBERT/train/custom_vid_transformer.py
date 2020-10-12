@@ -242,6 +242,11 @@ class VideoTransformer(nn.Module):
         pos = self.pos_encoding(torch.arange(0, seq.shape[1]).unsqueeze(0).repeat(seq.shape[0], 1).to(self.args.device))
         tok = self.tok_embed(seq) * self.scale
         tok_type = self.tok_type_embed(tok_type_ids)
+
+        ph = contains_nan(pos)
+        ph = contains_nan(tok)
+        ph = contains_nan(tok_type)
+
         seq = self.dropout(tok + pos + tok_type)
         if contains_nan(seq):
             print(contains_nan(pos), contains_nan(tok), contains_nan(tok_type))

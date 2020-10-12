@@ -243,9 +243,12 @@ class VideoTransformer(nn.Module):
         tok = self.tok_embed(seq) * self.scale
         tok_type = self.tok_type_embed(tok_type_ids)
 
-        ph = contains_nan(pos)
-        ph = contains_nan(tok)
-        ph = contains_nan(tok_type)
+        if contains_nan(pos):
+            print("pos")
+        if contains_nan(tok):
+            print("tok")
+        if contains_nan(tok_type):
+            print(tok_type)
 
         seq = self.dropout(tok + pos + tok_type)
         if contains_nan(seq):

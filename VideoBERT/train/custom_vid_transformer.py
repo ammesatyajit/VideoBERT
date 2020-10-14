@@ -263,3 +263,6 @@ class VideoTransformer(nn.Module):
         model = VideoTransformer(config, args)
         model.load_state_dict(torch.load(args.model_name_or_path + '/pytorch_model.bin'))
         return model
+
+    def save_pretrained(self, output_dir):
+        torch.save(self.state_dict(), output_dir + '/pytorch_model.bin')

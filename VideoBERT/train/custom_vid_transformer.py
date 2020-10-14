@@ -153,8 +153,14 @@ class VideoTransformer(nn.Module):
         assert contains_nan(self.scale).item() is False
 
         self.fc_out = nn.Linear(self.config.hidden_size, self.config.vocab_size)
+        print(self.config.num_hidden_layers/2)
 
-        self.transformer = nn.Transformer(d_model=self.config.hidden_size, nhead=self.config.num_attention_heads, num_encoder_layers=self.config.num_hidden_layers/2, num_decoder_layers=self.config.num_hidden_layers/2, activation=self.config.hidden_act, dropout=0.1)
+        self.transformer = nn.Transformer(d_model=self.config.hidden_size,
+                                          nhead=self.config.num_attention_heads,
+                                          num_encoder_layers=self.config.num_hidden_layers/2,
+                                          num_decoder_layers=self.config.num_hidden_layers/2,
+                                          activation=self.config.hidden_act,
+                                          dropout=0.1)
 
     def forward(
         self,

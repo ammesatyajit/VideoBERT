@@ -85,55 +85,67 @@ def main(colab_args=None):
 
                 if len(vsent) > 0:
                     print("vsent:", vsent)
-                    for i in range(10):
-                        if predictmode == 'vid-prior':
-                            input_ids = torch.tensor(np.hstack([
-                                np.array([101]),
-                                np.array(vsent),
-                                np.array([102])
-                            ]), dtype=torch.int64).unsqueeze(0)
+                    if predictmode == 'vid-prior':
+                        input_ids = torch.tensor(np.hstack([
+                            np.array([101]),
+                            vsent,
+                            np.array([102])
+                        ]), dtype=torch.int64).unsqueeze(0)
 
-                        input_ids = input_ids.to(device)
+                        token_type_ids = torch.tensor(np.hstack([
+                            np.ones(len(vsent) + 2)
+                        ]), dtype=torch.int64).unsqueeze(0)
+
+                    elif predictmode == 'joint-prior':
+                        input_ids = torch.tensor(np.hstack([
+                            np.array([101]),
+                            np.array(encoded),
+                            np.array([30522 + 20544]),
+                            vsent,
+                            np.array([102])
+                        ]), dtype=torch.int64).unsqueeze(0)
 
                         token_type_ids = torch.tensor(np.hstack([
                             np.zeros(len(encoded) + 2),
                             np.ones(len(vsent) + 1)
-                        ]), dtype=torch.int64)
+                        ]), dtype=torch.int64).unsqueeze(0)
 
-                        token_type_ids = token_type_ids.to(device)
+                    input_ids = input_ids.to(device)
+                    token_type_ids = token_type_ids.to(device)
 
-                        if predictmode == 'vid-prior':
-                            outputs = model(
-                                video_input_ids=input_ids,
-                                video_token_type_ids=token_type_ids,
-                            )
-                        else:
-                            outputs = model(
-                                joint_input_ids=input_ids,
-                                joint_token_type_ids=token_type_ids,
-                            )
+                    if predictmode == 'vid-prior':
+                        outputs = model(
+                            video_input_ids=input_ids,
+                            video_token_type_ids=token_type_ids,
+                            video_attention_mask=attn_mask,
+                        )
+                    elif predictmode == 'joint-prior':
+                        outputs = model(
+                            joint_input_ids=input_ids,
+                            joint_token_type_ids=token_type_ids,
+                        )
 
-                        input_ids = input_ids.to(torch.device('cpu'))
+                    input_ids = input_ids.to(torch.device('cpu'))
 
-                        input_ids = input_ids[0]
+                    input_ids = input_ids[0]
 
-                        prediction_scores = outputs[0]
+                    prediction_scores = outputs[0]
 
-                        mask_indices = (input_ids == tokenizer.mask_token_id).nonzero().squeeze()
+                    mask_indices = (input_ids == tokenizer.mask_token_id).nonzero().squeeze()
 
-                        if mask_indices.dim() == 0:
-                            mask_indices = torch.tensor([mask_indices])
+                    if mask_indices.dim() == 0:
+                        mask_indices = torch.tensor([mask_indices])
 
-                        if type(mask_indices) == int:
-                            mask_indices = torch.tensor([mask_indices])
+                    if type(mask_indices) == int:
+                        mask_indices = torch.tensor([mask_indices])
 
-                        for index, masked_index in enumerate(mask_indices):
-                            # print('mask index:', masked_index)
-                            logits = prediction_scores[0, masked_index, :] / temp
-                            probs = logits.softmax(dim=0)
-                            values, predictions = probs.topk(npreds)
-                            print('prediction:', predictions)
-                            vid_template[masked_index-1] = int(predictions[1])
+                    for index, masked_index in enumerate(mask_indices):
+                        # print('mask index:', masked_index)
+                        logits = prediction_scores[0, masked_index, :] / temp
+                        probs = logits.softmax(dim=0)
+                        values, predictions = probs.topk(npreds)
+                        print('prediction:', predictions)
+                        vid_template[masked_index-1] = int(predictions[1])
 
 
 if __name__ == "__main__":

@@ -79,25 +79,17 @@ def main(colab_args=None):
             annots = val['annotations']
 
             for an in annots:
-                template_sent = "now let me show you how to [MASK] the [MASK]."
-                encoded = tokenizer.encode(template_sent, add_special_tokens=False)
+                sent = an['sentence']
+                encoded = tokenizer.encode(sent, add_special_tokens=False)
+                vsent = np.array(an['video_ids']) + 30522
 
-                verbs_nouns_filt = an['verbs_nouns_filtered']
-                verbs = verbs_nouns_filt['verbs']
-                nouns = verbs_nouns_filt['nouns']
-                vsent = an['video_ids']
-
-                vid_template = [vsent[0] + 30522]
-
-                if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
-                    print("vsent:", np.array(vsent) + 30522)
+                if len(vsent) > 0:
+                    print("vsent:", vsent)
                     for i in range(10):
-                        print(vid_template)
                         if predictmode == 'vid-prior':
-                            vid_template.append(103)
                             input_ids = torch.tensor(np.hstack([
                                 np.array([101]),
-                                np.array(vid_template),
+                                np.array(vsent),
                                 np.array([102])
                             ]), dtype=torch.int64).unsqueeze(0)
 
@@ -112,7 +104,8 @@ def main(colab_args=None):
 
                         if predictmode == 'vid-prior':
                             outputs = model(
-                                video_input_ids=input_ids
+                                video_input_ids=input_ids,
+                                video_token_type_ids=token_type_ids,
                             )
                         else:
                             outputs = model(
@@ -141,7 +134,6 @@ def main(colab_args=None):
                             values, predictions = probs.topk(npreds)
                             print('prediction:', predictions)
                             vid_template[masked_index-1] = int(predictions[1])
-            exit(1)
 
 
 if __name__ == "__main__":

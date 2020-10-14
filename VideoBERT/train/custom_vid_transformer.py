@@ -265,9 +265,11 @@ class VideoTransformer(nn.Module):
                                memory_key_padding_mask=key_pad_mask).transpose(0, 1)
         return self.fc_out(out)
 
-    def from_pretrained(self, config, args):
-        model = VideoTransformer(config, args)
+    @classmethod
+    def from_pretrained(cls, config, args):
+        model = cls(config, args)
         model.load_state_dict(torch.load(args.model_name_or_path + '/pytorch_model.bin'))
+        model.eval()
         return model
 
     def save_pretrained(self, output_dir):

@@ -59,7 +59,7 @@ def main(colab_args=None):
     avg_loss = 0
     counter = 0
     temp = 1
-    predictmode = 'vid-prior'
+    predictmode = 'joint-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -121,8 +121,8 @@ def main(colab_args=None):
                     counter += 1
                     avg_loss += loss.item()
 
-                    output = torch.softmax(output, dim=1)
-                    print(output)
+                    output = torch.max(torch.softmax(output, dim=1), dim=1)
+                    print(output.shape, output.squeeze(0))
                     print("loss:", loss.item())
 
         avg_loss /= counter

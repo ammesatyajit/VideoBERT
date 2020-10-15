@@ -60,7 +60,7 @@ def main(colab_args=None):
 
     avg_loss = 0
     counter = 0
-    temp = 10
+    temp = 1
     predictmode = 'vid-prior'
 
     import json
@@ -123,11 +123,11 @@ def main(colab_args=None):
                     counter += 1
                     avg_loss += loss.item()
 
-                    for index, masked_index in enumerate(mask_indices):
-                        # print('mask index:', masked_index)
-                        logits = prediction_scores[0, masked_index, :]
-                        probs = logits.softmax(dim=0)
-                        print('prediction:', predictions)
+                    output = torch.softmax(output, dim=1)
+                    print(output)
+
+        avg_loss /= counter
+        print("Average loss for evaluation set with {}:".format(predictmode), avg_loss)
 
 
 if __name__ == "__main__":

@@ -38,14 +38,17 @@ def main(colab_args=None):
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
-        model = VideoTransformer.from_pretrained(
+        model = VideoTransformer(
             config=data_globals.config,
             args=args
         )
     else:
         # start from checkpoint
         print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
-        model = VideoBertForPreTraining.from_pretrained(args.model_name_or_path)
+        model = VideoTransformer.from_pretrained(
+            config=data_globals.config,
+            args=args
+        )
 
     print('WEIGHTS:')
     print(model.bert.embeddings.word_embeddings.weight)

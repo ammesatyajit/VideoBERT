@@ -123,6 +123,7 @@ def main(colab_args=None):
 
                     output = torch.softmax(output, dim=1)
                     print(output)
+                    print("loss:", loss.item())
 
         avg_loss /= counter
         print("Average loss for evaluation set with {}:".format(predictmode), avg_loss)

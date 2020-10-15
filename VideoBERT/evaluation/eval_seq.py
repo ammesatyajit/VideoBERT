@@ -50,9 +50,6 @@ def main(colab_args=None):
             args=args
         )
 
-    print('WEIGHTS:')
-    print(model.bert.embeddings.word_embeddings.weight)
-
     centroids = np.load(data_globals.centers_file)
     print('CENTROIDS:')
     print(centroids)

@@ -11,6 +11,7 @@ class ColabArgs():
                  cache_dir=None,
                  block_size=-1,
                  do_train=True,
+                 seq=False,
                  per_gpu_train_batch_size=4,
                  gradient_accumulation_steps=1,
                  learning_rate=1e-5,
@@ -41,6 +42,7 @@ class ColabArgs():
         self.cache_dir = cache_dir
         self.block_size = block_size
         self.do_train = do_train
+        self.seq = seq
         self.per_gpu_train_batch_size = per_gpu_train_batch_size
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.learning_rate = learning_rate

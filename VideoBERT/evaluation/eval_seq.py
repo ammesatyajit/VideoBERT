@@ -58,17 +58,10 @@ def main(colab_args=None):
 
     model.to(args.device)
 
-    top_stats = {
-        'verbs_top1': [],
-        'verbs_top5': [],
-        'nouns_top1': [],
-        'nouns_top5': [],
-    }
-
-    npreds = 5
-
-    predictmode = 'vid-prior'
+    avg_loss = 0
+    counter = 0
     temp = 10
+    predictmode = 'vid-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -112,40 +105,29 @@ def main(colab_args=None):
 
                     input_ids = input_ids.to(device)
                     token_type_ids = token_type_ids.to(device)
+                    attn_mask = (token_type_ids == -1).to(device)
 
                     if predictmode == 'vid-prior':
-                        outputs = model(
+                        output, loss = model(
                             video_input_ids=input_ids,
                             video_token_type_ids=token_type_ids,
                             video_attention_mask=attn_mask,
                         )
                     elif predictmode == 'joint-prior':
-                        outputs = model(
+                        output, loss = model(
                             joint_input_ids=input_ids,
                             joint_token_type_ids=token_type_ids,
+                            joint_attention_mask=attn_mask,
                         )
 
-                    input_ids = input_ids.to(torch.device('cpu'))
-
-                    input_ids = input_ids[0]
-
-                    prediction_scores = outputs[0]
-
-                    mask_indices = (input_ids == tokenizer.mask_token_id).nonzero().squeeze()
-
-                    if mask_indices.dim() == 0:
-                        mask_indices = torch.tensor([mask_indices])
-
-                    if type(mask_indices) == int:
-                        mask_indices = torch.tensor([mask_indices])
+                    counter += 1
+                    avg_loss += loss.item()
 
                     for index, masked_index in enumerate(mask_indices):
                         # print('mask index:', masked_index)
-                        logits = prediction_scores[0, masked_index, :] / temp
+                        logits = prediction_scores[0, masked_index, :]
                         probs = logits.softmax(dim=0)
-                        values, predictions = probs.topk(npreds)
                         print('prediction:', predictions)
-                        vid_template[masked_index-1] = int(predictions[1])
 
 
 if __name__ == "__main__":

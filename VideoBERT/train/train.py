@@ -298,7 +298,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             train_sampler.set_epoch(epoch)
 
         for step, batch in enumerate(epoch_iterator):
-
+            torch.cuda.empty_cache()
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1

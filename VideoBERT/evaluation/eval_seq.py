@@ -121,7 +121,7 @@ def main(colab_args=None):
                     counter += 1
                     avg_loss += loss.item()
 
-                    output = torch.softmax(output, dim=1).max(dim=1).detach()
+                    output = torch.softmax(output, dim=1).argmax(dim=1)
                     print(output.squeeze(0))
                     print("loss:", loss.item())
 

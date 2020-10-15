@@ -2,9 +2,8 @@ import argparse
 import numpy as np
 import torch
 import VideoBERT.data.globals as data_globals
-from transformers import BertTokenizer, BertForPreTraining
-from VideoBERT.train.modeling_video_bert import VideoBertForPreTraining
-from VideoBERT.train.model_utils import create_video_bert_save_dict_from_bert
+from transformers import BertTokenizer
+from VideoBERT.train.custom_vid_transformer import VideoTransformer
 import random
 
 
@@ -39,10 +38,9 @@ def main(colab_args=None):
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
-        model = VideoBertForPreTraining.from_pretrained(
-            pretrained_model_name_or_path=None,
-            state_dict=create_video_bert_save_dict_from_bert(data_globals.config),
-            config=data_globals.config
+        model = VideoTransformer.from_pretrained(
+            config=data_globals.config,
+            args=args
         )
     else:
         # start from checkpoint

@@ -358,9 +358,9 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
             )
 
             loss = outputs[0]
-            text_loss = outputs[1]
-            video_loss = outputs[2]
-            joint_loss = outputs[3]
+            text_loss = outputs[2]
+            video_loss = outputs[4]
+            joint_loss = outputs[6]
 
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training

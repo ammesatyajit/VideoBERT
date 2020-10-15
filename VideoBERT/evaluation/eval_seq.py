@@ -75,7 +75,6 @@ def main(colab_args=None):
                 vsent = np.array(an['video_ids']) + 30522
 
                 if len(vsent) > 0:
-                    print("vsent:", vsent)
                     if predictmode == 'vid-prior':
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
@@ -122,6 +121,7 @@ def main(colab_args=None):
                     avg_loss += loss.item()
 
                     output = torch.softmax(output, dim=1).argmax(dim=1)
+                    print(input_ids)
                     print(output.squeeze(0))
                     print("loss:", loss.item())
 

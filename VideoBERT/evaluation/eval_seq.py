@@ -13,6 +13,25 @@ def set_seed(args):
     torch.manual_seed(args.seed)
 
 
+def seq_gen(model, input_ids, device, predictmode='vid-prior'):
+    input_ids = input_ids.to(device)
+    while input_ids.squeeze(0)[-1] != 102:
+        if predictmode == 'vid-prior':
+            tok_type_ids = torch.ones(input_ids.shape).to(device)
+            attn_mask = (tok_type_ids == -1).to(device)
+
+            output = model(
+                video_input_ids=input_ids,
+                video_token_type_ids=tok_type_ids,
+                video_attention_mask=attn_mask,
+            )
+
+        output = torch.softmax(output, dim=2).argmax(dim=2)
+        input_ids = list(input_ids.squeeze(0))
+        input_ids.append(output.squeeze(0)[-1])
+        input_ids = torch.LongTensor(input_ids).unsqueeze(0)
+
+
 def main(colab_args=None):
     if colab_args:
         args = colab_args
@@ -100,30 +119,37 @@ def main(colab_args=None):
                             np.ones(len(vsent) + 1)
                         ]), dtype=torch.int64).unsqueeze(0)
 
-                    input_ids = input_ids.to(device)
-                    token_type_ids = token_type_ids.to(device)
-                    attn_mask = (token_type_ids == -1).to(device)
+                    if args.seq is True:
+                        input_ids = torch.tensor(np.hstack([
+                            np.array([101]),
+                            vsent[:3]
+                        ]), dtype=torch.int64).unsqueeze(0)
+                        seq_gen(model, input_ids, device, predictmode)
+                    else:
+                        input_ids = input_ids.to(device)
+                        token_type_ids = token_type_ids.to(device)
+                        attn_mask = (token_type_ids == -1).to(device)
 
-                    if predictmode == 'vid-prior':
-                        output, loss = model(
-                            video_input_ids=input_ids,
-                            video_token_type_ids=token_type_ids,
-                            video_attention_mask=attn_mask,
-                        )
-                    elif predictmode == 'joint-prior':
-                        output, loss = model(
-                            joint_input_ids=input_ids,
-                            joint_token_type_ids=token_type_ids,
-                            joint_attention_mask=attn_mask,
-                        )
+                        if predictmode == 'vid-prior':
+                            output, loss = model(
+                                video_input_ids=input_ids,
+                                video_token_type_ids=token_type_ids,
+                                video_attention_mask=attn_mask,
+                            )
+                        elif predictmode == 'joint-prior':
+                            output, loss = model(
+                                joint_input_ids=input_ids,
+                                joint_token_type_ids=token_type_ids,
+                                joint_attention_mask=attn_mask,
+                            )
 
-                    counter += 1
-                    avg_loss += loss.item()
+                        counter += 1
+                        avg_loss += loss.item()
 
-                    output = torch.softmax(output, dim=2).argmax(dim=2)
-                    print(input_ids)
-                    print(output.squeeze(0))
-                    print("loss:", loss.item())
+                        output = torch.softmax(output, dim=2).argmax(dim=2)
+                        print(input_ids)
+                        print(output.squeeze(0))
+                        print("loss:", loss.item())
 
         avg_loss /= counter
         print("Average loss for evaluation set with {}:".format(predictmode), avg_loss)

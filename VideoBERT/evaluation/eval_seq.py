@@ -17,7 +17,7 @@ def seq_gen(model, input_ids, device, predictmode='vid-prior'):
     input_ids = input_ids.to(device)
     while input_ids.squeeze(0)[-1] != 102:
         if predictmode == 'vid-prior':
-            tok_type_ids = torch.ones(input_ids.shape).to(device)
+            tok_type_ids = torch.LongTensor(torch.ones(input_ids.shape)).to(device)
             attn_mask = (tok_type_ids == -1).to(device)
 
             output = model(

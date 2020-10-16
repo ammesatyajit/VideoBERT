@@ -134,7 +134,7 @@ def main(colab_args=None):
                         print("unabridged input:", encoded)
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
-                            np.array(encoded),
+                            np.array(encoded[:2]),
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
                         print("shortened input:", input_ids)

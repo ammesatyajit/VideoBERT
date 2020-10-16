@@ -89,7 +89,7 @@ def main(colab_args=None):
     avg_loss = 0
     counter = 0
     temp = 1
-    predictmode = 'text-prior'
+    predictmode = 'vid-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -131,11 +131,18 @@ def main(colab_args=None):
                         ]), dtype=torch.int64).unsqueeze(0)
 
                     if args.seq is True:
-                        print("unabridged input:", encoded)
-                        input_ids = torch.tensor(np.hstack([
-                            np.array([101]),
-                            np.array(encoded[:2])
-                        ]), dtype=torch.int64).unsqueeze(0)
+                        if predictmode == 'text-prior':
+                            print("unabridged input:", encoded)
+                            input_ids = torch.tensor(np.hstack([
+                                np.array([101]),
+                                np.array(encoded[:2])
+                            ]), dtype=torch.int64).unsqueeze(0)
+                        elif predictmode == 'vid-prior':
+                            print("unabridged input:", vsent)
+                            input_ids = torch.tensor(np.hstack([
+                                np.array([101]),
+                                vsent[:2]
+                            ]), dtype=torch.int64).unsqueeze(0)
                         out = seq_gen(model, input_ids, device, predictmode)
                         print("output:", out)
                     else:

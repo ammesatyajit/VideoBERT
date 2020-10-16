@@ -20,7 +20,7 @@ def seq_gen(model, input_ids, device, predictmode='vid-prior'):
             tok_type_ids = torch.ones(input_ids.shape).long().to(device)
             attn_mask = (tok_type_ids == -1).to(device)
 
-            output = model(
+            output, _ = model(
                 video_input_ids=input_ids,
                 video_token_type_ids=tok_type_ids,
                 video_attention_mask=attn_mask,

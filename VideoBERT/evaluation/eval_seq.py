@@ -89,7 +89,7 @@ def main(colab_args=None):
     avg_loss = 0
     counter = 0
     temp = 1
-    predictmode = 'vid-prior'
+    predictmode = 'text-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:

@@ -148,7 +148,7 @@ def mask_tokens(inputs: torch.Tensor, tokenizer: PreTrainedTokenizer, args) -> T
     return inputs, labels
 
 
-def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
+def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
     """ Train the model """
     # will graph summary of training and eval at the end of each epoch
     tb_writer = SummaryWriter()

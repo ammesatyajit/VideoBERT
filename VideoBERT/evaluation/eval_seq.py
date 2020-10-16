@@ -134,8 +134,7 @@ def main(colab_args=None):
                         print("unabridged input:", encoded)
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
-                            np.array(encoded[:2]),
-                            np.array([102])
+                            np.array(encoded[:2])
                         ]), dtype=torch.int64).unsqueeze(0)
                         out = seq_gen(model, input_ids, device, predictmode)
                         print("output:", out)
@@ -164,8 +163,8 @@ def main(colab_args=None):
                         print(output.squeeze(0))
                         print("loss:", loss.item())
 
-        avg_loss /= counter
-        print("Average loss for evaluation set with {}:".format(predictmode), avg_loss)
+    avg_loss /= counter
+    print("Average loss for evaluation set with {}:".format(predictmode), avg_loss)
 
 
 if __name__ == "__main__":

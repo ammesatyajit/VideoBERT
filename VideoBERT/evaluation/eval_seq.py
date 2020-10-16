@@ -137,7 +137,6 @@ def main(colab_args=None):
                             np.array(encoded[:2]),
                             np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
-                        print("shortened input:", input_ids)
                         out = seq_gen(model, input_ids, device, predictmode)
                         print("output:", out)
                     else:

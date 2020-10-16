@@ -340,6 +340,7 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
             video_inputs = video_inputs.to(args.device)
 
             joint_inputs = joint_inputs.to(args.device)
+            print("text input: {}\nvideo input: {}".format(text_inputs, video_ids))
 
             model.train()
 

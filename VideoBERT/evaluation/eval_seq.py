@@ -121,15 +121,16 @@ def main(colab_args=None):
                             np.ones(len(vsent) + 1)
                         ]), dtype=torch.int64).unsqueeze(0)
 
-                    print(input_ids)
+                    print("unabridged input:", input_ids)
 
                     if args.seq is True:
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
                             vsent[:3]
                         ]), dtype=torch.int64).unsqueeze(0)
+                        print("shortened input:", input_ids)
                         out = seq_gen(model, input_ids, device, predictmode)
-                        print(out)
+                        print("output:", out)
                     else:
                         input_ids = input_ids.to(device)
                         token_type_ids = token_type_ids.to(device)

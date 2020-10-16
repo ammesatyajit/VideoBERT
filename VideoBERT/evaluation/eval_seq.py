@@ -31,6 +31,8 @@ def seq_gen(model, input_ids, device, predictmode='vid-prior'):
         input_ids.append(output.squeeze(0)[-1])
         input_ids = torch.LongTensor(input_ids).unsqueeze(0)
 
+    return input_ids
+
 
 def main(colab_args=None):
     if colab_args:
@@ -119,12 +121,15 @@ def main(colab_args=None):
                             np.ones(len(vsent) + 1)
                         ]), dtype=torch.int64).unsqueeze(0)
 
+                    print(input_ids)
+
                     if args.seq is True:
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
                             vsent[:3]
                         ]), dtype=torch.int64).unsqueeze(0)
-                        seq_gen(model, input_ids, device, predictmode)
+                        out = seq_gen(model, input_ids, device, predictmode)
+                        print(out)
                     else:
                         input_ids = input_ids.to(device)
                         token_type_ids = token_type_ids.to(device)
@@ -147,7 +152,6 @@ def main(colab_args=None):
                         avg_loss += loss.item()
 
                         output = torch.softmax(output, dim=2).argmax(dim=2)
-                        print(input_ids)
                         print(output.squeeze(0))
                         print("loss:", loss.item())
 

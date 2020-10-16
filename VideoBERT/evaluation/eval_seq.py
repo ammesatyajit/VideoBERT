@@ -25,6 +25,15 @@ def seq_gen(model, input_ids, device, predictmode='vid-prior'):
                 video_token_type_ids=tok_type_ids,
                 video_attention_mask=attn_mask,
             )
+        elif predictmode == 'text-prior':
+            tok_type_ids = torch.zeros(input_ids.shape).long().to(device)
+            attn_mask = (tok_type_ids == -1).to(device)
+
+            output, _ = model(
+                text_input_ids=input_ids,
+                text_token_type_ids=tok_type_ids,
+                text_attention_mask=attn_mask,
+            )
 
         output = torch.softmax(output, dim=2).argmax(dim=2)
         input_ids = list(input_ids.squeeze(0))
@@ -80,7 +89,7 @@ def main(colab_args=None):
     avg_loss = 0
     counter = 0
     temp = 1
-    predictmode = 'vid-prior'
+    predictmode = 'text-prior'
 
     import json
     with open(data_globals.val_youcook, 'r') as fd:
@@ -121,12 +130,12 @@ def main(colab_args=None):
                             np.ones(len(vsent) + 1)
                         ]), dtype=torch.int64).unsqueeze(0)
 
-                    print("unabridged input:", input_ids)
-
                     if args.seq is True:
+                        print("unabridged input:", encoded)
                         input_ids = torch.tensor(np.hstack([
                             np.array([101]),
-                            vsent[:3]
+                            np.array(encoded),
+                            np.array([102])
                         ]), dtype=torch.int64).unsqueeze(0)
                         print("shortened input:", input_ids)
                         out = seq_gen(model, input_ids, device, predictmode)

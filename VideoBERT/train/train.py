@@ -21,7 +21,6 @@ import argparse
 import glob
 import logging
 import os
-import pickle
 import random
 import re
 import shutil
@@ -48,7 +47,7 @@ from transformers import (
 )
 
 import VideoBERT.data.globals as data_globals
-from VideoBERT.train.custom_vid_transformer import VideoBertForPreTraining, VideoTransformer
+from VideoBERT.train.custom_vid_transformer import VideoTransformer
 from VideoBERT.train.model_utils import *
 from VideoBERT.data.VideoBertDataset import VideoBertDataset
 
@@ -298,7 +297,6 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
             train_sampler.set_epoch(epoch)
 
         for step, batch in enumerate(epoch_iterator):
-            torch.cuda.empty_cache()
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -454,12 +452,6 @@ def main(colab_args=None):
             help="The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.",
         )
         parser.add_argument(
-            "--mlm", action="store_true", help="Train with masked-language modeling loss instead of language modeling."
-        )
-        parser.add_argument(
-            "--mlm_probability", type=float, default=0.15, help="Ratio of tokens to mask for masked language modeling loss"
-        )
-        parser.add_argument(
             "--config_name",
             default=None,
             type=str,
@@ -517,7 +509,6 @@ def main(colab_args=None):
             default=None,
             help="Limit the total amount of checkpoints, delete the older checkpoints in the output_dir, does not delete by default",
         )
-        parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
         parser.add_argument(
             "--overwrite_output_dir", action="store_true", help="Overwrite the content of the output directory"
         )
@@ -548,8 +539,8 @@ def main(colab_args=None):
         )
 
     # Setup CUDA, GPU
-    device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
-    args.n_gpu = 0 if args.no_cuda else torch.cuda.device_count()
+    device = torch.device('cuda:{}'.format(torch.cuda.current_device()) if torch.cuda.is_available() else "cpu")
+    args.n_gpu = 0 if device == 'cpu' else torch.cuda.device_count()
     args.device = device
 
     # Setup logging

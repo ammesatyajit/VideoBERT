@@ -4,8 +4,6 @@ class ColabArgs():
                  model_type,
                  should_continue=False,
                  model_name_or_path=None,
-                 mlm=False,
-                 mlm_probability=0.15,
                  config_name=None,
                  tokenizer_name=None,
                  cache_dir=None,
@@ -26,7 +24,6 @@ class ColabArgs():
                  logging_steps=500,
                  save_steps=500,
                  save_total_limit=5,
-                 no_cuda=False,
                  overwrite_output_dir=False,
                  overwrite_cache=False,
                  seed=42,
@@ -35,8 +32,6 @@ class ColabArgs():
         self.model_type = model_type
         self.should_continue = should_continue
         self.model_name_or_path = model_name_or_path
-        self.mlm = mlm
-        self.mlm_probability = mlm_probability
         self.config_name = config_name
         self.tokenizer_name = tokenizer_name
         self.cache_dir = cache_dir
@@ -57,7 +52,6 @@ class ColabArgs():
         self.logging_steps = logging_steps
         self.save_steps = save_steps
         self.save_total_limit = save_total_limit
-        self.no_cuda = no_cuda
         self.overwrite_output_dir = overwrite_output_dir
         self.overwrite_cache = overwrite_cache
         self.seed = seed

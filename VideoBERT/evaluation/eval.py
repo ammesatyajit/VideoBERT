@@ -136,7 +136,7 @@ def main(colab_args=None):
     losses["video_avg_loss"] /= counter
     losses["joint_avg_loss"] /= counter
 
-    print("Average loss far val set\n--------------------------"
+    print("\nAverage loss for validation set\n----------------------------------"
           "\nTotal avg loss: {}"
           "\nText avg loss: {}"
           "\nVideo avg loss: {}"

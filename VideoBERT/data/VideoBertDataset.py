@@ -5,18 +5,15 @@ import torch
 import os
 import numpy as np
 import random
+import pandas as pd
 import VideoBERT.data.globals as data_globals
+
 
 class VideoBertDataset(Dataset):
     def __init__(self, tokenizer, data_path):
         self.data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), data_path)
-        self.data = np.load(self.data_path, allow_pickle=True).item()
+        self.data = pd.read_csv(self.data_path, delimiter=',')
         self.tokenizer = tokenizer
-        self.total_items = self.count()
-        print('total items:', self.total_items)
-
-        self.items = [None] * self.total_items
-
         self.setup_data()
 
     def create_concat_joint_sentence(self, i, max_token_len=-1):
@@ -245,28 +242,14 @@ class VideoBertDataset(Dataset):
             second_token_type_ids
         ]), dtype=torch.int64)
 
-
     def setup_data(self):
-        i = 0
-        for _, val in self.data.items():
-            text_items = val['text']
-            video_items = val['video']
-
-            start_boundary_index = i
-            end_boundary_index = i + len(text_items)-1
-
-            for t, v in zip(text_items, video_items):
-                self.items[i] = (t, v, start_boundary_index, end_boundary_index)
-                i += 1
-
-    def count(self):
-        total = 0
-        for _, val in self.data.items():
-            total += len(val['text'])  # adjust for last item, has no natural follow-up
-        return total
+        self.data = [tuple(x) for x in self.data.values]
+        for data_tuple in self.data:
+            data_tuple[0] = eval(data_tuple[0])
+            data_tuple[1] = eval(data_tuple[1])
 
     def __len__(self):
-        return self.total_items
+        return len(self.data)
 
     def __getitem__(self, i):
         text_sentence, text_label, text_token_type_ids = self.create_next_sentence_pair(i, 'text', max_token_len=37)

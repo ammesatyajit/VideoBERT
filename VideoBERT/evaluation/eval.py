@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import torch
 import pandas as pd
+import tqdm
 import VideoBERT.data.globals as data_globals
 from transformers import BertTokenizer
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
@@ -67,7 +68,7 @@ def main(colab_args=None):
     data = pd.read_csv('/content/drive/My Drive/VideoBERT/val_data.csv', delimiter=',')
     data = data.to_dict('records')
 
-    for nr, val in enumerate(data, start=1):
+    for nr, val in tqdm.tqdm(enumerate(data, start=1)):
         print('nr:', nr)
         annots = eval(val['annotations'])
 

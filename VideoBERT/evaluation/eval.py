@@ -61,7 +61,7 @@ def main(colab_args=None):
     losses = {"total_avg_loss": 0,
               "text_avg_loss": 0,
               "video_avg_loss": 0,
-              "joint_avg_loss:": 0}
+              "joint_avg_loss": 0}
     counter = 0
     temp = 1
 
@@ -69,7 +69,6 @@ def main(colab_args=None):
     data = data.to_dict('records')
 
     for nr, val in tqdm.tqdm(enumerate(data, start=1)):
-        print('nr:', nr)
         annots = eval(val['annotations'])
 
         for an in annots:

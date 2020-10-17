@@ -236,6 +236,7 @@ class VideoBertDataset(Dataset):
             np.hstack([
                 np.array(self.tokenizer.cls_token_id),
                 np.array(first_sentence),
+                np.array(self.tokenizer.sep_token_id),
                 np.array(second_sentence),
                 np.array(self.tokenizer.sep_token_id)
             ]), dtype=torch.int64

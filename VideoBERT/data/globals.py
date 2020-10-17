@@ -19,9 +19,9 @@ vis_lin_glue_token_id = bert_vocab_size + visual_vocab_size
 frozen_indices = torch.arange(bert_vocab_size, dtype=torch.int64)
 
 root_path = '/content/drive/My Drive/VideoBERT'
-data_path = '/content/drive/My Drive/VideoBERT/newest-data-max-len-20.npy'
+data_path = '/content/drive/My Drive/VideoBERT/training_data.csv'
 centers_file = '/content/drive/My Drive/VideoBERT/centers.npy'
-val_youcook = '/content/drive/My Drive/VideoBERT/val_youcook_captions.json'
+val_youcook = '/content/drive/My Drive/VideoBERT/val_data.csv'
 
 config = BertConfig(
     vocab_size=total_vocab_size,

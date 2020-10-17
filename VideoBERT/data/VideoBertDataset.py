@@ -17,8 +17,8 @@ class VideoBertDataset(Dataset):
         self.setup_data()
 
     def create_concat_joint_sentence(self, i, max_token_len=-1):
-        start_boundary_index = self.items[i][2]
-        end_boundary_index = self.items[i][3]
+        start_boundary_index = self.data[i][2]
+        end_boundary_index = self.data[i][3]
 
         text_index = -1
         video_index = -1
@@ -95,11 +95,11 @@ class VideoBertDataset(Dataset):
             video_sentence = []
 
             for ti, vi in zip(text_index, video_index):
-                text_sentence += self.items[ti][0]
-                video_sentence += self.items[vi][1]
+                text_sentence += self.data[ti][0]
+                video_sentence += self.data[vi][1]
         else:
-            text_sentence = self.items[text_index][0]
-            video_sentence = self.items[video_index][1]
+            text_sentence = self.data[text_index][0]
+            video_sentence = self.data[video_index][1]
 
         if max_token_len > 0:
             if (len(text_sentence) + len(video_sentence)) > max_token_len:
@@ -125,8 +125,8 @@ class VideoBertDataset(Dataset):
         ]), dtype=torch.int64)
 
     def create_joint_sentence(self, i, max_token_len=-1):
-        start_boundary_index = self.items[i][2]
-        end_boundary_index = self.items[i][3]
+        start_boundary_index = self.data[i][2]
+        end_boundary_index = self.data[i][3]
 
         text_index = -1
         video_index = -1
@@ -154,8 +154,8 @@ class VideoBertDataset(Dataset):
                 video_index = random.choice(indices)
                 label = 1 # not temporarily aligned
 
-        text_sentence = self.items[text_index][0]
-        video_sentence = self.items[video_index][1]
+        text_sentence = self.data[text_index][0]
+        video_sentence = self.data[video_index][1]
 
         if max_token_len > 0:
             if (len(text_sentence) + len(video_sentence)) > max_token_len:
@@ -186,8 +186,8 @@ class VideoBertDataset(Dataset):
         elif mode == 'video':
             mode_index = 1
 
-        start_boundary_index = self.items[i][2]
-        end_boundary_index = self.items[i][3]
+        start_boundary_index = self.data[i][2]
+        end_boundary_index = self.data[i][3]
 
         label = -1
 
@@ -195,14 +195,14 @@ class VideoBertDataset(Dataset):
         second_sentence = None
 
         if i == end_boundary_index and i == start_boundary_index:
-            first_sentence = self.items[i][mode_index]
-            second_sentence = self.items[i][mode_index]
+            first_sentence = self.data[i][mode_index]
+            second_sentence = self.data[i][mode_index]
             label = 1 # not natural next sentence
         else:
             if i == end_boundary_index:
                 i -= 1
 
-            first_sentence = self.items[i][mode_index]
+            first_sentence = self.data[i][mode_index]
 
             r = random.uniform(0, 1)
 
@@ -216,7 +216,7 @@ class VideoBertDataset(Dataset):
                 next_index = random.choice(indices)
                 label = 1
 
-            second_sentence = self.items[next_index][mode_index]
+            second_sentence = self.data[next_index][mode_index]
 
         if max_token_len > 0:
             if (len(first_sentence) + len(second_sentence)) > max_token_len:

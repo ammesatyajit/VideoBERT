@@ -1,10 +1,10 @@
 import argparse
 import numpy as np
 import torch
+import pandas as pd
 import VideoBERT.data.globals as data_globals
-from transformers import BertTokenizer, BertForPreTraining
-from VideoBERT.train.modeling_video_bert import VideoBertForPreTraining
-from VideoBERT.train.model_utils import create_video_bert_save_dict_from_bert
+from transformers import BertTokenizer
+from VideoBERT.train.custom_vid_transformer import VideoTransformer
 import random
 
 
@@ -16,7 +16,7 @@ def set_seed(args):
 
 def main(colab_args=None):
     if colab_args:
-       args = colab_args
+        args = colab_args
     else:
         parser = argparse.ArgumentParser()
 
@@ -39,18 +39,17 @@ def main(colab_args=None):
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
-        model = VideoBertForPreTraining.from_pretrained(
-            pretrained_model_name_or_path=None,
-            state_dict=create_video_bert_save_dict_from_bert(data_globals.config),
-            config=data_globals.config
+        model = VideoTransformer(
+            config=data_globals.config,
+            args=args
         )
     else:
         # start from checkpoint
         print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
-        model = VideoBertForPreTraining.from_pretrained(args.model_name_or_path)
-
-    print('WEIGHTS:')
-    print(model.bert.embeddings.word_embeddings.weight)
+        model = VideoTransformer.from_pretrained(
+            config=data_globals.config,
+            args=args
+        )
 
     centroids = np.load(data_globals.centers_file)
     print('CENTROIDS:')
@@ -58,163 +57,90 @@ def main(colab_args=None):
 
     model.to(args.device)
 
-    top_stats = {
-        'verbs_top1': [],
-        'verbs_top5': [],
-        'nouns_top1': [],
-        'nouns_top5': [],
-    }
+    losses = {"total_avg_loss": 0,
+              "text_avg_loss": 0,
+              "video_avg_loss": 0,
+              "joint_avg_loss:": 0}
+    counter = 0
+    temp = 1
 
-    npreds = 5
+    data = pd.read_csv('/content/drive/My Drive/VideoBERT/val_data.csv', delimiter=',')
+    data = data.to_dict('records')
 
-    predictmode = 'cross-prior'
+    for nr, val in enumerate(data, start=1):
+        print('nr:', nr)
+        annots = eval(val['annotations'])
 
-    import json
-    with open(data_globals.val_youcook, 'r') as fd:
-        data = json.load(fd)
+        for an in annots:
+            sent = an['sentence']
+            encoded = tokenizer.encode(sent, add_special_tokens=False)
+            vsent = np.array(an['video_ids']) + 30522
 
-        for nr, (id, val) in enumerate(data.items(), start=1):
-            print('nr:', nr)
-            annots = val['annotations']
+            if len(vsent) > 0:
+                text_ids = torch.tensor(np.hstack([
+                    np.array([101]),
+                    np.array(encoded),
+                    np.array([102])
+                ]), dtype=torch.int64).unsqueeze(0).to(device)
+                text_type_ids = torch.zeros_like(text_ids).to(device)
+                text_attn_mask = (text_type_ids == -1).to(device)
 
-            for an in annots:
-                template_sent = "now let me show you how to [MASK] the [MASK]."
-                encoded = tokenizer.encode(template_sent, add_special_tokens=False)
+                vid_ids = torch.tensor(np.hstack([
+                    np.array([101]),
+                    vsent,
+                    np.array([102])
+                ]), dtype=torch.int64).unsqueeze(0).to(device)
+                vid_type_ids = torch.ones_like(vid_ids).to(device)
+                vid_attn_mask = (vid_type_ids == -1).to(device)
 
-                verbs_nouns_filt = an['verbs_nouns_filtered']
-                verbs = verbs_nouns_filt['verbs']
-                nouns = verbs_nouns_filt['nouns']
-                vsent = an['video_ids']
+                joint_ids = torch.tensor(np.hstack([
+                    np.array([101]),
+                    np.array(encoded),
+                    np.array([30522 + 20544]),
+                    vsent,
+                    np.array([102])
+                ]), dtype=torch.int64).unsqueeze(0).to(device)
+                joint_type_ids = torch.tensor(np.hstack([
+                    np.zeros(len(encoded) + 2),
+                    np.ones(len(vsent) + 1)
+                ]), dtype=torch.int64).unsqueeze(0).to(device)
+                joint_attn_mask = (joint_type_ids == -1).to(device)
 
-                vid_template = np.array(vsent) + 30522
-                vid_template[2] = 103
+                outputs = model(
+                    text_input_ids=text_ids,
+                    video_input_ids=vid_ids,
+                    joint_input_ids=joint_ids,
 
-                if len(vsent) > 0 and (len(verbs) > 0 or len(nouns) > 0):
-                    if predictmode == 'lang-prior':
-                        input_ids = torch.tensor(np.hstack([
-                            np.array([101]),
-                            np.array(encoded),
-                            np.array([102])
-                        ]), dtype=torch.int64).unsqueeze(0)
-                    elif predictmode == 'vid-prior':
-                        input_ids = torch.tensor(np.hstack([
-                            np.array([101]),
-                            vid_template,
-                            np.array([102])
-                        ]), dtype=torch.int64).unsqueeze(0)
-                    else:
-                        input_ids = torch.tensor(np.hstack([
-                            np.array([101]),
-                            np.array(encoded),
-                            np.array([30522 + 20544]),
-                            np.array(vsent) + 30522,
-                            np.array([102])
-                        ]), dtype=torch.int64).unsqueeze(0)
+                    text_token_type_ids=text_type_ids,
+                    video_token_type_ids=vid_type_ids,
+                    joint_token_type_ids=joint_type_ids,
 
-                    input_ids = input_ids.to(device)
+                    text_attention_mask=text_attn_mask,
+                    video_attention_mask=vid_attn_mask,
+                    joint_attention_mask=joint_attn_mask,
+                )
 
-                    token_type_ids = torch.tensor(np.hstack([
-                        np.zeros(len(encoded) + 2),
-                        np.ones(len(vsent) + 1)
-                    ]), dtype=torch.int64)
+                loss = outputs[0]
+                text_loss = outputs[2]
+                video_loss = outputs[4]
+                joint_loss = outputs[6]
 
-                    token_type_ids = token_type_ids.to(device)
+                counter += 1
+                losses["total_avg_loss"] += loss.item()
+                losses["text_avg_loss"] += text_loss.item()
+                losses["video_avg_loss"] += video_loss.item()
+                losses["joint_avg_loss"] += joint_loss.item()
 
-                    if predictmode == 'lang-prior':
-                        outputs = model(
-                            text_input_ids=input_ids,
-                        )
-                    elif predictmode == 'vid-prior':
-                        outputs = model(
-                            video_input_ids=input_ids
-                        )
-                    else:
-                        outputs = model(
-                            joint_input_ids=input_ids,
-                            joint_token_type_ids=token_type_ids,
-                        )
+    losses["total_avg_loss"] /= counter
+    losses["text_avg_loss"] /= counter
+    losses["video_avg_loss"] /= counter
+    losses["joint_avg_loss"] /= counter
 
-                    input_ids = input_ids.to(torch.device('cpu'))
-
-                    input_ids = input_ids[0]
-
-                    prediction_scores = outputs[0]
-
-                    mask_indices = (input_ids == tokenizer.mask_token_id).nonzero().squeeze()
-
-                    if mask_indices.dim() == 0:
-                        mask_indices = torch.tensor([mask_indices])
-
-                    if type(mask_indices) == int:
-                        mask_indices = torch.tensor([mask_indices])
-
-                    results = [[], []]
-
-                    for index, masked_index in enumerate(mask_indices):
-                        # print('mask index:', masked_index)
-                        logits = prediction_scores[0, masked_index, :]
-                        probs = logits.softmax(dim=0)
-                        values, predictions = probs.topk(npreds)
-
-                        for i, (v, p) in enumerate(zip(values.tolist(), predictions.tolist())):
-                            results[index].append(tokenizer.decode([p]))
-
-                    predicted_verbs = results[0][:5]
-                    if predictmode == 'lang-prior':
-                        predicted_nouns = results[1][:5]
-                    else:
-                        predicted_nouns = results[1][1:]
-
-                    print('verbs:', verbs)
-                    print('predicted verbs:', predicted_verbs)
-
-                    print('nouns:', nouns)
-                    print('predicted nouns:', predicted_nouns)
-                    print('')
-
-                    if len(verbs) > 0:
-                        top_stats['verbs_top1'].append(predicted_verbs[0] in verbs)
-
-                    if len(nouns) > 0:
-                        top_stats['nouns_top1'].append(predicted_nouns[0] in nouns)
-
-                    if len(verbs) > 0:
-                        verbs_top5 = False
-
-                        for v in predicted_verbs:
-                            if v in verbs:
-                                verbs_top5 = True
-                                break
-
-                        top_stats['verbs_top5'].append(verbs_top5)
-
-                    if len(nouns) > 0:
-                        nouns_top5 = False
-
-                        for n in predicted_nouns:
-                            if n in nouns:
-                                nouns_top5 = True
-                                break
-
-                        top_stats['nouns_top5'].append(nouns_top5)
-
-    verbs_top1 = np.array(top_stats['verbs_top1'])
-    verbs_top5 = np.array(top_stats['verbs_top5'])
-
-    nouns_top1 = np.array(top_stats['nouns_top1'])
-    nouns_top5 = np.array(top_stats['nouns_top5'])
-
-    verbs_top1_acc = len(verbs_top1.nonzero()[0]) / len(verbs_top1)
-    verbs_top5_acc = len(verbs_top5.nonzero()[0]) / len(verbs_top5)
-
-    nouns_top1_acc = len(nouns_top1.nonzero()[0]) / len(nouns_top1)
-    nouns_top5_acc = len(nouns_top5.nonzero()[0]) / len(nouns_top5)
-
-    print('verbs top 1:', verbs_top1_acc)
-    print('verbs top 5:', verbs_top5_acc)
-
-    print('nouns top 1:', nouns_top1_acc)
-    print('nouns top 5:', nouns_top5_acc)
+    print("Average loss far val set\n--------------------------"
+          "\nTotal avg loss: {}"
+          "\nText avg loss: {}"
+          "\nVideo avg loss: {}"
+          "\nJoint avg loss: {}".format(losses["total_avg_loss"], losses["text_avg_loss"], losses["video_avg_loss"], losses["joint_avg_loss"]))
 
 
 if __name__ == "__main__":

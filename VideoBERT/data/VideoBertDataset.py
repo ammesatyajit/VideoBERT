@@ -243,7 +243,7 @@ class VideoBertDataset(Dataset):
         ]), dtype=torch.int64)
 
     def setup_data(self):
-        self.data = [tuple(x) for x in self.data.values]
+        self.data = [list(x) for x in self.data.values]
         for data_tuple in self.data:
             data_tuple[0] = eval(data_tuple[0])
             data_tuple[1] = eval(data_tuple[1])

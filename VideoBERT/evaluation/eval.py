@@ -68,7 +68,7 @@ def main(colab_args=None):
     data = pd.read_csv('/content/drive/My Drive/VideoBERT/val_data.csv', delimiter=',')
     data = data.to_dict('records')
 
-    for nr, val in tqdm.tqdm(enumerate(data, start=1)):
+    for nr, val in enumerate(tqdm.tqdm(data), start=1):
         annots = eval(val['annotations'])
 
         for an in annots:

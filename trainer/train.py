@@ -452,6 +452,12 @@ def main(colab_args=None):
             help="The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.",
         )
         parser.add_argument(
+            "--data_path",
+            default=None,
+            type=str,
+            help="The csv file for training the model"
+        )
+        parser.add_argument(
             "--config_name",
             default=None,
             type=str,
@@ -575,7 +581,7 @@ def main(colab_args=None):
 
     # Training
     if args.do_train:
-        train_dataset = VideoBertDataset(tokenizer, data_path=data_globals.data_path)
+        train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
 
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)

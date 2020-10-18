@@ -571,10 +571,6 @@ def main(colab_args=None):
         print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
         model = VideoTransformer.from_pretrained(config=data_globals.config, args=args)
 
-    centroids = np.load(data_globals.centers_file)
-    print('CENTROIDS:')
-    print(centroids)
-
     model.to(args.device)
 
     logger.info("Training/evaluation parameters %s", args)

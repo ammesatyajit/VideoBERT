@@ -480,7 +480,6 @@ def main(colab_args=None):
             "The training dataset will be truncated in block of this size for training."
             "Default to the model max input length for single sentence inputs (take into account special tokens).",
         )
-        parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
         parser.add_argument("--per_gpu_train_batch_size", default=4, type=int, help="Batch size per GPU/CPU for training.")
         parser.add_argument(
             "--gradient_accumulation_steps",
@@ -573,11 +572,10 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    if args.do_train:
-        train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
+    train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
 
-        global_step, tr_loss = train(args, train_dataset, model, tokenizer)
-        logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
+    global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+    logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
 
 if __name__ == "__main__":

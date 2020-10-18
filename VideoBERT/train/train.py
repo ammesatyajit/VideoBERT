@@ -440,9 +440,6 @@ def main(colab_args=None):
             help="The output directory where the model predictions and checkpoints will be written.",
         )
         parser.add_argument(
-            "--model_type", type=str, required=True, help="The model architecture to be trained or fine-tuned.",
-        )
-        parser.add_argument(
             "--should_continue", action="store_true", help="Whether to continue from latest checkpoint in output_dir"
         )
         parser.add_argument(

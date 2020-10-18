@@ -15,7 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "transformers",
-        "tensorboardX"
+        "tensorboardX",
+        "torch"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -54,7 +54,7 @@ def main(colab_args=None):
 
     centroids = np.load(data_globals.centers_file)
     print('CENTROIDS:')
-    print(centroids)
+    print(centroids.shape)
 
     model.to(args.device)
 

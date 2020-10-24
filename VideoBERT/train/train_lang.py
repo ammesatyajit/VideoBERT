@@ -418,6 +418,7 @@ def main(colab_args=None):
 
     train_data, valid_data, test_data = IWSLT.splits(exts=('.en','.de'), fields=(tok, plc))
     tok.build_vocab(train_data, min_freq=1)
+    plc.build_vocab(train_data, min_freq=1)
     train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=args.per_gpu_train_batch_size,

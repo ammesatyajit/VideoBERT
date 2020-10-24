@@ -402,7 +402,7 @@ def main(colab_args=None):
                 lower=True,
                 batch_first=True)
 
-    train_data, valid_data, test_data = IWSLT.splits(exts=('.en'), fields=(tok))
+    train_data, valid_data, test_data = IWSLT.splits(exts=('.en',), fields=(tok,))
     tok.build_vocab(train_data, min_freq=1)
     train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
         (train_data, valid_data, test_data),

@@ -479,7 +479,7 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    global_step, tr_loss = train(args, model, train_dataloader)
+    global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
     logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
 

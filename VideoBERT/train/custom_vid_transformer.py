@@ -11,7 +11,7 @@ class VideoTransformer(nn.Module):
         self.args = args
 
         self.tok_embed = nn.Embedding(self.config.vocab_size, self.config.hidden_size)
-        self.pos_encoding = nn.Embedding(315, self.config.hidden_size)
+        self.pos_encoding = nn.Embedding(400, self.config.hidden_size)
         self.tok_type_embed = nn.Embedding(2, self.config.hidden_size)
 
         self.dropout = nn.Dropout(0.1)

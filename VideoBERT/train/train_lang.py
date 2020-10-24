@@ -98,7 +98,56 @@ def _rotate_checkpoints(args, checkpoint_prefix="checkpoint", use_mtime=False) -
         shutil.rmtree(checkpoint)
 
 
-def train(args, model, train_dataloader) -> Tuple[int, float]:
+def val(args, model, valid_dataloader):
+    """ Train the model """
+    # will graph summary of training and eval at the end of each epoch
+    tb_writer = SummaryWriter()
+
+    # Calculates the batch size for training given number of gpus and batch size for gpus
+    args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
+
+    # Train!
+    logger.info("***** Running training *****")
+    logger.info("  Num examples = %d", valid_dataloader.__len__())
+    logger.info("  Num Epochs = %d", args.num_train_epochs)
+    logger.info("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
+    logger.info(
+        "  Total train batch size (w. parallel, distributed & accumulation) = %d",
+        args.train_batch_size
+        * args.gradient_accumulation_steps
+        * (torch.distributed.get_world_size() if args.local_rank != -1 else 1),
+    )
+
+    tr_loss, logging_loss = 0.0, 0.0
+
+    model.zero_grad()
+    set_seed(args)  # Added here for reproducibility
+    model.eval()
+
+    iterator = tqdm(valid_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
+    total_steps = 0
+    for step, batch in enumerate(iterator):
+        torch.cuda.empty_cache()
+
+        text_ids = batch.src
+        text_inputs = text_ids.to(args.device)
+        text_token_type_ids = torch.zeros_like(text_ids).to(args.device)
+        text_attention_masks = (text_inputs == 1).to(args.device)
+
+        outputs = model(
+            text_input_ids=text_inputs,
+            text_token_type_ids=text_token_type_ids,
+            text_attention_mask=text_attention_masks,
+        )
+
+        loss = outputs[1]
+        tr_loss += loss.item()
+        total_steps += 1
+
+    print("Validation Loss: ", tr_loss / total_steps)
+
+
+def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
     """ Train the model """
     # will graph summary of training and eval at the end of each epoch
     tb_writer = SummaryWriter()
@@ -229,6 +278,7 @@ def train(args, model, train_dataloader) -> Tuple[int, float]:
                     logging_loss = tr_loss
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
+                    val(args, model, valid_dataloader)
                     checkpoint_prefix = "checkpoint"
                     # Save model checkpoint
                     output_dir = os.path.join(args.output_dir, "{}-{}".format(checkpoint_prefix, global_step))
@@ -390,21 +440,6 @@ def main(colab_args=None):
     set_seed(args)
 
     # setup tokenizer and model
-    if args.model_name_or_path is None:
-        # start from inital model
-        print('### LOADING INITIAL MODEL ###')
-        model = VideoTransformer(config=data_globals.config, args=args)
-        model.apply(initialize_weights)
-    else:
-        # start from checkpoint
-        print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
-        model = VideoTransformer.from_pretrained(config=data_globals.config, args=args)
-
-    model.to(args.device)
-
-    logger.info("Training/evaluation parameters %s", args)
-
-    # Training
     tok = Field(tokenize=tokenize_en,
                 init_token='<sos>',
                 eos_token='<eos>',
@@ -417,14 +452,33 @@ def main(colab_args=None):
                 lower=True,
                 batch_first=True)
 
-    train_data, valid_data, test_data = IWSLT.splits(exts=('.en','.de'), fields=(tok, plc))
+    train_data, valid_data, test_data = IWSLT.splits(exts=('.en', '.de'), fields=(tok, plc))
+
     tok.build_vocab(train_data, min_freq=1)
     plc.build_vocab(train_data, min_freq=1)
+
     train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
         (train_data, valid_data, test_data),
         batch_size=args.per_gpu_train_batch_size,
         device=args.device)
 
+    config = data_globals.config
+    config.vocab_size = len(tok.vocab)
+
+    if args.model_name_or_path is None:
+        # start from inital model
+        print('### LOADING INITIAL MODEL ###')
+        model = VideoTransformer(config=config, args=args)
+        model.apply(initialize_weights)
+    else:
+        # start from checkpoint
+        print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
+        model = VideoTransformer.from_pretrained(config=config, args=args)
+
+    model.to(args.device)
+    logger.info("Training/evaluation parameters %s", args)
+
+    # Training
     global_step, tr_loss = train(args, model, train_dataloader)
     logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 

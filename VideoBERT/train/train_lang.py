@@ -47,6 +47,13 @@ def tokenize_en(text):
     return [tok.text for tok in spacy_en.tokenizer(text)]
 
 
+def tokenize_de(text):
+    """
+    Tokenizes English text from a string into a list of strings
+    """
+    return [tok.text for tok in spacy_de.tokenizer(text)]
+
+
 def set_seed(args):
     random.seed(args.seed)
     np.random.seed(args.seed)

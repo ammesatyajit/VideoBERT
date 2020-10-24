@@ -1,7 +1,6 @@
 class ColabArgs():
     def __init__(self,
                  output_dir,
-                 model_type,
                  should_continue=False,
                  model_name_or_path=None,
                  config_name=None,
@@ -29,7 +28,6 @@ class ColabArgs():
                  seed=42,
                  device='cuda'):
         self.output_dir = output_dir
-        self.model_type = model_type
         self.should_continue = should_continue
         self.model_name_or_path = model_name_or_path
         self.config_name = config_name

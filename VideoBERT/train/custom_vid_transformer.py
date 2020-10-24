@@ -11,7 +11,7 @@ class VideoTransformer(nn.Module):
         self.args = args
 
         self.tok_embed = nn.Embedding(self.config.vocab_size, self.config.hidden_size)
-        self.pos_encoding = nn.Embedding(400, self.config.hidden_size)
+        self.pos_encoding = nn.Embedding(300, self.config.hidden_size)
         self.tok_type_embed = nn.Embedding(2, self.config.hidden_size)
 
         self.dropout = nn.Dropout(0.1)
@@ -117,9 +117,15 @@ class VideoTransformer(nn.Module):
         tok_type = self.tok_type_embed(tok_type_ids)
 
         seq = self.dropout(tok + pos + tok_type)
-        if contains_nan(seq):
-            print(contains_nan(pos), contains_nan(tok), contains_nan(tok_type))
-            raise RuntimeError("One of pos, tok, or tok_type contains a nan")
+        if contains_nan(pos):
+            print(contains_nan(pos))
+            raise RuntimeError("pos contains a nan")
+        if contains_nan(tok):
+            print(contains_nan(tok))
+            raise RuntimeError("tok contains a nan")
+        if contains_nan(tok_type):
+            print(contains_nan(tok_type))
+            raise RuntimeError("tok_type contains a nan")
         seq = seq.transpose(0, 1)
 
         out = self.transformer(seq,

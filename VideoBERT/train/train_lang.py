@@ -420,7 +420,7 @@ def main(colab_args=None):
     tok.build_vocab(train_data, min_freq=1)
     train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
         (train_data, valid_data, test_data),
-        batch_size=args.train_batch_size,
+        batch_size=args.per_gpu_train_batch_size,
         device=args.device)
 
     global_step, tr_loss = train(args, model, train_dataloader)

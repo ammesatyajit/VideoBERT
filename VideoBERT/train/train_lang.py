@@ -24,7 +24,7 @@ from transformers import (
 
 import spacy
 
-spacy_en = spacy.load('n')
+spacy_en = spacy.load('en')
 
 import VideoBERT.data.globals as data_globals
 from VideoBERT.train.custom_vid_transformer import VideoTransformer

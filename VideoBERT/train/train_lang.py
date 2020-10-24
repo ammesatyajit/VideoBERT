@@ -187,7 +187,7 @@ def train(args, model, train_dataloader) -> Tuple[int, float]:
                 steps_trained_in_current_epoch -= 1
                 continue
 
-            text_ids = batch.tok
+            text_ids = batch.src
             text_inputs = text_ids.to(args.device)
             text_token_type_ids = torch.zeros_like(text_ids).to(args.device)
             text_attention_masks = (text_inputs == 1).to(args.device)

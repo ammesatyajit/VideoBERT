@@ -242,6 +242,9 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
             text_token_type_ids = torch.zeros_like(text_ids).to(args.device)
             text_attention_masks = (text_inputs == 1).to(args.device)
 
+            if text_inputs.shape[1] >= 300:
+                continue
+
             outputs = model(
                 text_input_ids=text_inputs,
                 text_token_type_ids=text_token_type_ids,

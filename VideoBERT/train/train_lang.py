@@ -25,6 +25,7 @@ from transformers import (
 import spacy
 
 spacy_en = spacy.load('en')
+spacy_de = spacy.load('de')
 
 import VideoBERT.data.globals as data_globals
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
@@ -402,7 +403,13 @@ def main(colab_args=None):
                 lower=True,
                 batch_first=True)
 
-    train_data, valid_data, test_data = IWSLT.splits(exts=('.en',), fields=(tok,))
+    plc = Field(tokenize=tokenize_de,
+                init_token='<sos>',
+                eos_token='<eos>',
+                lower=True,
+                batch_first=True)
+
+    train_data, valid_data, test_data = IWSLT.splits(exts=('.en','.de'), fields=(tok, plc))
     tok.build_vocab(train_data, min_freq=1)
     train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
         (train_data, valid_data, test_data),

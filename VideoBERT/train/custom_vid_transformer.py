@@ -117,15 +117,18 @@ class VideoTransformer(nn.Module):
         tok_type = self.tok_type_embed(tok_type_ids)
 
         seq = self.dropout(tok + pos + tok_type)
-        if contains_nan(pos):
-            print(contains_nan(pos))
-            raise RuntimeError("pos contains a nan")
-        if contains_nan(tok):
-            print(contains_nan(tok))
-            raise RuntimeError("tok contains a nan")
-        if contains_nan(tok_type):
-            print(contains_nan(tok_type))
-            raise RuntimeError("tok_type contains a nan")
+        try:
+            if contains_nan(pos):
+                print(contains_nan(pos))
+                raise RuntimeError("pos contains a nan")
+            if contains_nan(tok):
+                print(contains_nan(tok))
+                raise RuntimeError("tok contains a nan")
+            if contains_nan(tok_type):
+                print(contains_nan(tok_type))
+                raise RuntimeError("tok_type contains a nan")
+        except:
+            print(seq.shape[1])
         seq = seq.transpose(0, 1)
 
         out = self.transformer(seq,

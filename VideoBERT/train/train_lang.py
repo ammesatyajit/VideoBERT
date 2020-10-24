@@ -1,22 +1,3 @@
-# coding=utf-8
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
-# Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
-# This code is based on code from https://github.com/huggingface/transformers
-
 import argparse
 import glob
 import logging
@@ -24,27 +5,26 @@ import os
 import random
 import re
 import shutil
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler
-from torch.utils.data.distributed import DistributedSampler
+from torchtext.datasets import TranslationDataset, Multi30k, IWSLT, WMT14
+from torchtext.data import Field, BucketIterator
 from tqdm import tqdm, trange
 
 from transformers import (
-    MODEL_WITH_LM_HEAD_MAPPING,
-    WEIGHTS_NAME,
     AdamW,
-    AutoConfig,
-    AutoModelWithLMHead,
-    AutoTokenizer,
-    PreTrainedModel,
     PreTrainedTokenizer,
     get_linear_schedule_with_warmup,
     BertTokenizer,
 )
+
+import spacy
+
+spacy_en = spacy.load('n')
 
 import VideoBERT.data.globals as data_globals
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
@@ -56,12 +36,14 @@ try:
 except ImportError:
     from tensorboardX import SummaryWriter
 
-
 logger = logging.getLogger(__name__)
 
 
-MODEL_CONFIG_CLASSES = list(MODEL_WITH_LM_HEAD_MAPPING.keys())
-MODEL_TYPES = tuple(conf.model_type for conf in MODEL_CONFIG_CLASSES)
+def tokenize_en(text):
+    """
+    Tokenizes English text from a string into a list of strings
+    """
+    return [tok.text for tok in spacy_en.tokenizer(text)]
 
 
 def set_seed(args):
@@ -108,77 +90,13 @@ def _rotate_checkpoints(args, checkpoint_prefix="checkpoint", use_mtime=False) -
         shutil.rmtree(checkpoint)
 
 
-def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[int, float]:
+def train(args, model, train_dataloader) -> Tuple[int, float]:
     """ Train the model """
     # will graph summary of training and eval at the end of each epoch
     tb_writer = SummaryWriter()
 
     # Calculates the batch size for training given number of gpus and batch size for gpus
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
-
-    # pads each sentence
-    def pad_examples(examples, padding_value=tokenizer.pad_token_id):
-        if tokenizer._pad_token is None:
-            return pad_sequence(examples, batch_first=True)
-        return pad_sequence(examples, batch_first=True, padding_value=padding_value)
-
-    # returns data that is converted to tensor and padded, as well as ids and attention mask
-    def collate(examples):
-        text_examples = [None] * len(examples)
-        text_labels = [None] * len(examples)
-        text_type_ids = [None] * len(examples)
-
-        video_examples = [None] * len(examples)
-        video_labels = [None] * len(examples)
-        video_type_ids = [None] * len(examples)
-
-        joint_examples = [None] * len(examples)
-        joint_labels = [None] * len(examples)
-        joint_type_ids = [None] * len(examples)
-
-        for i, (te, tl, tti, ve, vl, vti, je, jl, jti) in enumerate(examples):
-            text_examples[i] = te
-            video_examples[i] = ve
-            text_labels[i] = tl
-            video_labels[i] = vl
-
-            text_type_ids[i] = tti
-            video_type_ids[i] = vti
-
-            joint_examples[i] = je
-            joint_labels[i] = jl
-            joint_type_ids[i] = jti
-
-        padded_text_ids = pad_examples(text_examples)
-        text_attention_mask = torch.ones(padded_text_ids.shape, dtype=torch.int64)
-        text_attention_mask[(padded_text_ids == 0)] = 0
-
-        padded_video_ids = pad_examples(video_examples)
-        video_attention_mask = torch.ones(padded_video_ids.shape, dtype=torch.int64)
-        video_attention_mask[(padded_video_ids == 0)] = 0
-
-        padded_joint_ids = pad_examples(joint_examples)
-        joint_attention_mask = torch.ones(padded_joint_ids.shape, dtype=torch.int64)
-        joint_attention_mask[(padded_joint_ids == 0)] = 0
-
-        return padded_text_ids, \
-               torch.tensor(text_labels, dtype=torch.int64), \
-               pad_examples(text_type_ids, padding_value=0), \
-               text_attention_mask, \
-               padded_video_ids, \
-               torch.tensor(video_labels, dtype=torch.int64), \
-               pad_examples(video_type_ids, padding_value=0), \
-               video_attention_mask, \
-               padded_joint_ids, \
-               torch.tensor(joint_labels, dtype=torch.int64), \
-               pad_examples(joint_type_ids, padding_value=0), \
-               joint_attention_mask
-
-    # initializes dataloader
-    train_sampler = RandomSampler(train_dataset)
-    train_dataloader = DataLoader(
-        train_dataset, sampler=train_sampler, batch_size=args.train_batch_size, collate_fn=collate
-    )
 
     # calculates number of epochs based on number of steps to take in training
     if args.max_steps > 0:
@@ -203,9 +121,9 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
 
     # Check if saved optimizer or scheduler states exist
     if (
-        args.model_name_or_path
-        and os.path.isfile(os.path.join(args.model_name_or_path, "optimizer.pt"))
-        and os.path.isfile(os.path.join(args.model_name_or_path, "scheduler.pt"))
+            args.model_name_or_path
+            and os.path.isfile(os.path.join(args.model_name_or_path, "optimizer.pt"))
+            and os.path.isfile(os.path.join(args.model_name_or_path, "scheduler.pt"))
     ):
         # Load in optimizer and scheduler states
         optimizer.load_state_dict(torch.load(os.path.join(args.model_name_or_path, "optimizer.pt")))
@@ -213,7 +131,7 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
 
     # Train!
     logger.info("***** Running training *****")
-    logger.info("  Num examples = %d", len(train_dataset))
+    logger.info("  Num examples = %d", train_dataloader.__len__())
     logger.info("  Num Epochs = %d", args.num_train_epochs)
     logger.info("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
     logger.info(
@@ -251,11 +169,9 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
         epochs_trained, int(args.num_train_epochs), desc="Epoch", disable=args.local_rank not in [-1, 0]
     )
     set_seed(args)  # Added here for reproducibility
+    model.train()
     for epoch in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
-
-        if args.local_rank != -1:
-            train_sampler.set_epoch(epoch)
 
         for step, batch in enumerate(epoch_iterator):
             # Skip past any already trained steps if resuming training
@@ -263,64 +179,18 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
                 steps_trained_in_current_epoch -= 1
                 continue
 
-            text_ids = batch[0]
-            text_seq_labels = batch[1]
-            text_token_type_ids = batch[2]
-            text_attention_masks = batch[3]
-
-            video_ids = batch[4]
-            video_seq_labels = batch[5]
-            video_token_type_ids = batch[6]
-            video_attention_masks = batch[7]
-
-            joint_ids = batch[8]
-            joint_labels = batch[9]
-            joint_token_type_ids = batch[10]
-            joint_attention_masks = batch[11]
-
-            text_inputs = torch.LongTensor(text_ids)
-            video_inputs = torch.LongTensor(video_ids)
-            joint_inputs = torch.LongTensor(joint_ids)
-
-            text_inputs = text_inputs.to(args.device)
-
-            text_token_type_ids = text_token_type_ids.to(args.device)
-            video_token_type_ids = video_token_type_ids.to(args.device)
-            joint_token_type_ids = joint_token_type_ids.to(args.device)
-
-            text_attention_masks = (text_attention_masks == 0)
-            video_attention_masks = (video_attention_masks == 0)
-            joint_attention_masks = (joint_attention_masks == 0)
-
-            text_attention_masks = text_attention_masks.to(args.device)
-            video_attention_masks = video_attention_masks.to(args.device)
-            joint_attention_masks = joint_attention_masks.to(args.device)
-
-            video_inputs = video_inputs.to(args.device)
-
-            joint_inputs = joint_inputs.to(args.device)
-            # print("text input: {}\nvideo input: {}".format(text_inputs, video_ids))
-
-            model.train()
+            text_ids = batch.tok
+            text_inputs = text_ids.to(args.device)
+            text_token_type_ids = torch.zeros_like(text_ids).to(args.device)
+            text_attention_masks = (text_inputs == 1).to(args.device)
 
             outputs = model(
                 text_input_ids=text_inputs,
-                video_input_ids=video_inputs,
-                joint_input_ids=joint_inputs,
-
                 text_token_type_ids=text_token_type_ids,
-                video_token_type_ids=video_token_type_ids,
-                joint_token_type_ids=joint_token_type_ids,
-
                 text_attention_mask=text_attention_masks,
-                video_attention_mask=video_attention_masks,
-                joint_attention_mask=joint_attention_masks,
             )
 
-            loss = outputs[0]
-            text_loss = outputs[2]
-            video_loss = outputs[4]
-            joint_loss = outputs[6]
+            loss = outputs[1]
 
             if args.n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu parallel training
@@ -336,10 +206,7 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
 
-                print('loss:', loss.item(),
-                      'text loss:', text_loss.item(),
-                      'video loss:', video_loss.item(),
-                      'joint loss:', joint_loss.item())
+                print('text_loss:', loss.item())
 
                 optimizer.step()
                 scheduler.step()  # Update learning rate schedule
@@ -350,9 +217,6 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
                     print('writing tf logs...')
                     tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
                     tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
-                    tb_writer.add_scalar("text_loss", text_loss.item(), global_step)
-                    tb_writer.add_scalar("video_loss", video_loss.item(), global_step)
-                    tb_writer.add_scalar("joint_loss", joint_loss.item(), global_step)
                     logging_loss = tr_loss
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
@@ -364,7 +228,6 @@ def train(args, train_dataset, model, tokenizer: PreTrainedTokenizer) -> Tuple[i
                         model.module if hasattr(model, "module") else model
                     )  # Take care of distributed/parallel training
                     model_to_save.save_pretrained(output_dir)
-                    tokenizer.save_pretrained(output_dir)
 
                     torch.save(args, os.path.join(output_dir, "training_args.bin"))
                     logger.info("Saving model checkpoint to %s", output_dir)
@@ -438,10 +301,11 @@ def main(colab_args=None):
             default=-1,
             type=int,
             help="Optional input sequence length after tokenization."
-            "The training dataset will be truncated in block of this size for training."
-            "Default to the model max input length for single sentence inputs (take into account special tokens).",
+                 "The training dataset will be truncated in block of this size for training."
+                 "Default to the model max input length for single sentence inputs (take into account special tokens).",
         )
-        parser.add_argument("--per_gpu_train_batch_size", default=4, type=int, help="Batch size per GPU/CPU for training.")
+        parser.add_argument("--per_gpu_train_batch_size", default=4, type=int,
+                            help="Batch size per GPU/CPU for training.")
         parser.add_argument(
             "--gradient_accumulation_steps",
             type=int,
@@ -489,11 +353,11 @@ def main(colab_args=None):
             args.model_name_or_path = sorted_checkpoints[-1]
 
     if (
-        os.path.exists(args.output_dir)
-        and os.listdir(args.output_dir)
-        and args.do_train
-        and not args.overwrite_output_dir
-        and not args.should_continue
+            os.path.exists(args.output_dir)
+            and os.listdir(args.output_dir)
+            and args.do_train
+            and not args.overwrite_output_dir
+            and not args.should_continue
     ):
         raise ValueError(
             "Output directory ({}) already exists and is not empty. Use --overwrite_output_dir to overcome.".format(
@@ -517,7 +381,6 @@ def main(colab_args=None):
     set_seed(args)
 
     # setup tokenizer and model
-    tokenizer = BertTokenizer.from_pretrained(data_globals.bert_model)
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
@@ -533,9 +396,20 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
+    tok = Field(tokenize=tokenize_en,
+                init_token='<sos>',
+                eos_token='<eos>',
+                lower=True,
+                batch_first=True)
 
-    global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+    train_data, valid_data, test_data = IWSLT.splits(exts=('.en'), fields=(tok))
+    tok.build_vocab(train_data, min_freq=1)
+    train_dataloader, valid_dataloader, test_dataloader = BucketIterator.splits(
+        (train_data, valid_data, test_data),
+        batch_size=args.train_batch_size,
+        device=args.device)
+
+    global_step, tr_loss = train(args, model, train_dataloader)
     logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
 

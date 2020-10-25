@@ -316,7 +316,7 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
     return global_step, tr_loss / global_step
 
 
-def main(colab_args=None):
+def main(colab_args=None, do_train=True):
     if colab_args:
         args = colab_args
     else:
@@ -485,8 +485,11 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
-    logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
+    if do_train:
+        global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
+        logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
+    else:
+        val(args, model, valid_dataloader)
 
 
 if __name__ == "__main__":

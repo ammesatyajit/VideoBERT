@@ -221,6 +221,8 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
 
     tr_loss, logging_loss = 0.0, 0.0
 
+    val(args, model, valid_dataloader)
+
     model.zero_grad()
     train_iterator = trange(
         epochs_trained, int(args.num_train_epochs), desc="Epoch", disable=args.local_rank not in [-1, 0]
@@ -282,6 +284,7 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
                     val(args, model, valid_dataloader)
+                    model.train()
                     checkpoint_prefix = "checkpoint"
                     # Save model checkpoint
                     output_dir = os.path.join(args.output_dir, "{}-{}".format(checkpoint_prefix, global_step))

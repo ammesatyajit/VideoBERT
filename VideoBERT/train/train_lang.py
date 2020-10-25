@@ -99,7 +99,7 @@ def _rotate_checkpoints(args, checkpoint_prefix="checkpoint", use_mtime=False) -
 
 
 def val(args, model, valid_dataloader):
-    """ Train the model """
+    """ Evaluate the model """
     # will graph summary of training and eval at the end of each epoch
     tb_writer = SummaryWriter()
 
@@ -120,7 +120,6 @@ def val(args, model, valid_dataloader):
 
     tr_loss, logging_loss = 0.0, 0.0
 
-    model.zero_grad()
     set_seed(args)  # Added here for reproducibility
     model.eval()
 
@@ -316,6 +315,11 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
     return global_step, tr_loss / global_step
 
 
+def inference(args, model, test_dataloader, tokenizer):
+    model.eval()
+    iterator = tqdm(test_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
+
+
 def main(colab_args=None, do_train=True):
     if colab_args:
         args = colab_args
@@ -489,7 +493,7 @@ def main(colab_args=None, do_train=True):
         global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
     else:
-        val(args, model, valid_dataloader)
+        val(args, model, test_dataloader)
 
 
 if __name__ == "__main__":

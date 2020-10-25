@@ -315,9 +315,13 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
     return global_step, tr_loss / global_step
 
 
-def inference(args, model, test_dataloader, tokenizer):
+def inference(args, model, test_dataset, tokenizer):
     model.eval()
-    iterator = tqdm(test_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
+    dataset = tqdm(test_dataset, desc="Testing", disable=args.local_rank not in [-1, 0])
+
+    for example in dataset:
+        print(example.src)
+        break
 
 
 def main(colab_args=None, do_train=True):
@@ -493,7 +497,8 @@ def main(colab_args=None, do_train=True):
         global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
     else:
-        val(args, model, test_dataloader)
+        val(args, model, valid_dataloader)
+        inference(args, model, test_data, tok)
 
 
 if __name__ == "__main__":

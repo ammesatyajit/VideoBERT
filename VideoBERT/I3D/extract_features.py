@@ -7,7 +7,7 @@ from VideoBERT.I3D.I3DModelWrapper import I3DModel
 batch_count = 20
 clip_frame_count = 15
 im_size = 224
-model = I3DModel('VideoBERT/I3D/i3d-checkpoint/rgb_scratch_kin600/model.ckpt')
+model = I3DModel('../VideoBERT/I3D/i3d-checkpoint/rgb_scratch_kin600/model.ckpt')
 
 
 def process_batch(batch, batch_id, save_dir):

@@ -9,6 +9,7 @@ clip_frame_count = 15
 im_size = 224
 model = I3DModel('model/graph_optimized.pb')
 
+
 def process_batch(batch, batch_id, save_dir):
     print('processing batch...')
 
@@ -27,11 +28,13 @@ def process_batch(batch, batch_id, save_dir):
 def extract_features(path, save_dir):
     batch_id = 1
     cap = cv2.VideoCapture(path)
+    interval = int(cap.get(cv2.CAP_PROP_FPS) / 10 + 0.5)
 
     batch_total_frames = batch_count * clip_frame_count
     batch = np.zeros((batch_total_frames, im_size, im_size, 3))
 
     i = 0
+    counter = 0
     while cap.isOpened():
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -39,14 +42,16 @@ def extract_features(path, save_dir):
             # reach to the end of the video file
             break
 
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        batch[i] = frame  # np.interp(frame, (frame.min(), frame.max()), (-1, +1))
+        if counter % interval == 0:
+            frame = cv2.resize(frame, (im_size, im_size))
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            batch[i] = frame  # np.interp(frame, (frame.min(), frame.max()), (-1, +1))
 
-        i += 1
-        if i == batch_total_frames:
-            i = 0
-            process_batch(batch, batch_id, save_dir)
-            batch_id += 1
+            i += 1
+            if i == batch_total_frames:
+                i = 0
+                process_batch(batch, batch_id, save_dir)
+                batch_id += 1
 
     if i > 0:
         # nclips = i // clip_frame_count

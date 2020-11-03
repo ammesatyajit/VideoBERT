@@ -10,6 +10,11 @@ im_size = 224
 model = I3DModel('VideoBERT/I3D/i3d-checkpoint/rgb_scratch_kin600/model.ckpt')
 
 
+def return_model():
+    out_model = I3DModel('VideoBERT/I3D/i3d-checkpoint/rgb_scratch_kin600/model.ckpt')
+    return out_model
+
+
 def process_batch(batch, batch_id, save_dir):
     print('processing batch...')
 

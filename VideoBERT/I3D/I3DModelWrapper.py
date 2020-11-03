@@ -18,7 +18,7 @@ class I3DModel:
             self.sess.close()
 
     def load_graph(self, frozen_graph_filename):
-        with tf.gfile.GFile(frozen_graph_filename, "rb") as f:
+        with tf.io.gfile.GFile(frozen_graph_filename, "rb") as f:
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
 

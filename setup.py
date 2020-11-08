@@ -16,7 +16,8 @@ setuptools.setup(
     install_requires=[
         "transformers",
         "tensorboardX",
-        "torch"
+        "torch",
+        "tensorflow_hub"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

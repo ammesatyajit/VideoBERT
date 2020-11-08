@@ -12,6 +12,8 @@ clip_frame_count = 15
 im_size = 224
 model = hub.load("https://tfhub.dev/deepmind/i3d-kinetics-600/1").signatures['default']
 
+tf.compat.v1.enable_eager_execution()
+tf.executing_eagerly()
 
 def process_batch(device_name, batch, batch_id, save_dir):
     print('processing batch...')

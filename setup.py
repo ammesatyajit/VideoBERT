@@ -17,7 +17,8 @@ setuptools.setup(
         "transformers",
         "tensorboardX",
         "torch",
-        "tensorflow_hub"
+        "tensorflow_hub",
+        "opencv-python"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

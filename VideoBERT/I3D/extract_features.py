@@ -57,7 +57,7 @@ def extract_features(device_name, path, features_save_dir, imgs_save_dir):
 
             i += 1
             if (counter // interval) % 15 == 8:
-                img_id = (counter // interval - 8) // 15
+                img_id = (int(counter / interval) - 8) // 15
                 frame = torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0)
                 frame = frame / 255
                 save_image(frame, os.path.join(imgs_save_dir, 'img-{id:04}-{row:02}.jpg'.format(id=batch_id, row=img_id % 20)))

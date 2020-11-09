@@ -34,8 +34,9 @@ def process_batch(device_name, batch, batch_id, save_dir):
 def extract_features(device_name, path, features_save_dir, imgs_save_dir):
     batch_id = 1
     cap = cv2.VideoCapture(path)
-    interval = int(cap.get(cv2.CAP_PROP_FPS) / 10 + 0.5)
-    print(cap.get(cv2.CAP_PROP_FPS), "\ninterval:", interval)
+    fps = int(cap.get(cv2.CAP_PROP_FPS) + 0.5)
+    interval = fps / 10
+    print(fps, "fps", "\ninterval:", interval)
 
     batch_total_frames = batch_count * clip_frame_count
     batch = np.zeros((batch_total_frames, im_size, im_size, 3))
@@ -49,7 +50,7 @@ def extract_features(device_name, path, features_save_dir, imgs_save_dir):
             # reach to the end of the video file
             break
 
-        if counter % interval == 0:
+        if int(counter % interval) == 0:
             frame = cv2.resize(frame, (im_size, im_size))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             batch[i] = frame

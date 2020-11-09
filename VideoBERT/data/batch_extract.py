@@ -25,7 +25,7 @@ pathlib.Path(features_save_path).mkdir(parents=True, exist_ok=True)
 pathlib.Path(imgs_save_path).mkdir(parents=True, exist_ok=True)
 
 with open(video_file_list_path, 'r') as fd:
-    video_files = list(map(lambda l: l.strip(), fd.readlines()))
+    video_files = list(map(lambda l: l.strip()[31:], fd.readlines()))
 
 video_paths = [os.path.join(video_root_path, f) for f in video_files]
 

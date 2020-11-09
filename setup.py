@@ -18,7 +18,8 @@ setuptools.setup(
         "tensorboardX",
         "torch",
         "tensorflow_hub",
-        "opencv-python"
+        "opencv-python",
+        "torchvision"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

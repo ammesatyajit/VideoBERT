@@ -5,6 +5,9 @@ import argparse
 import pathlib
 
 
+device_name = tf.test.gpu_device_name()
+print("device name:", device_name)
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-f', '--file-list-path', type=str, required=True, help='path to file containing video file names')
@@ -17,9 +20,6 @@ video_file_list_path = args.file_list_path
 video_root_path = args.root_video_path
 features_save_path = args.features_save_path
 imgs_save_path = args.imgs_save_path
-
-device_name = tf.test.gpu_device_name()
-print("device name:", device_name)
 
 pathlib.Path(features_save_path).mkdir(parents=True, exist_ok=True)
 pathlib.Path(imgs_save_path).mkdir(parents=True, exist_ok=True)

@@ -336,7 +336,7 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
             sentence.insert(-1, pred)
         for i in range(len(sentence)):
             sentence[i] = tokenizer.vocab.itos[sentence[i]]
-        print(sentence)
+        print(''.join(sentence))
 
 
 def main(colab_args=None, do_train=True):

@@ -138,7 +138,7 @@ def val(args, model, valid_dataloader):
             text_token_type_ids=text_token_type_ids,
             text_attention_mask=text_attention_masks,
         )
-
+        print(outputs[0].argmax(2))
         loss = outputs[1]
         tr_loss += loss.item()
         total_steps += 1
@@ -332,7 +332,7 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
                     text_token_type_ids=tok_type_ids,
                     text_attention_mask=attn_mask,
                 )
-            print(output[0].argmax(2))
+            print(output[0].shape)
         break
 
 
@@ -509,8 +509,8 @@ def main(colab_args=None, do_train=True):
         global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
     else:
-        val(args, model, valid_dataloader)
-        inference(args, model, test_data, tok)
+        val(args, model, test_dataloader)
+        inference(args, model, valid_data, tok)
 
 
 if __name__ == "__main__":

@@ -139,7 +139,6 @@ def val(args, model, valid_dataloader):
             text_token_type_ids=text_token_type_ids,
             text_attention_mask=text_attention_masks,
         )
-        print(outputs[0].argmax(2))
         loss = outputs[1]
         tr_loss += loss.item()
         total_steps += 1
@@ -323,7 +322,6 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
     for example in dataset:
         sentence = [tokenizer.vocab.stoi[tokenizer.init_token], tokenizer.vocab.stoi[example.src[0]], tokenizer.vocab.stoi[example.src[1]], tokenizer.vocab.stoi[tokenizer.eos_token]]
         for i in range(max_len):
-            print("sentence:", sentence)
             inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
             tok_type_ids = torch.zeros_like(inp_tensor).to(args.device)
             attn_mask = (inp_tensor == 1).to(args.device)
@@ -333,7 +331,6 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
                     text_token_type_ids=tok_type_ids,
                     text_attention_mask=attn_mask,
                 )
-            print(output[0].argmax(2))
             pred = output[0].argmax(2)[:,-1].item()
             if pred == tokenizer.vocab.stoi[tokenizer.eos_token]:
                 break
@@ -341,8 +338,6 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
         for i in range(len(sentence)):
             sentence[i] = tokenizer.vocab.itos[sentence[i]]
         print(sentence)
-
-        break
 
 
 def main(colab_args=None, do_train=True):

@@ -129,7 +129,6 @@ def val(args, model, valid_dataloader):
         torch.cuda.empty_cache()
 
         text_ids = batch.src
-        print(text_ids)
         text_inputs = text_ids.to(args.device)
         text_token_type_ids = torch.zeros_like(text_ids).to(args.device)
         text_attention_masks = (text_inputs == 1).to(args.device)

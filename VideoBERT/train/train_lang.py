@@ -322,8 +322,8 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
 
     for example in dataset:
         sentence = [tokenizer.vocab.stoi[tokenizer.init_token], tokenizer.vocab.stoi[example.src[0]], tokenizer.vocab.stoi[example.src[1]], tokenizer.vocab.stoi[tokenizer.eos_token]]
-        for i in range(2):
-            print(sentence)
+        for i in range(max_len):
+            print("sentence:", sentence)
             inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
             tok_type_ids = torch.zeros_like(inp_tensor).to(args.device)
             attn_mask = (inp_tensor == 1).to(args.device)
@@ -333,7 +333,15 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
                     text_token_type_ids=tok_type_ids,
                     text_attention_mask=attn_mask,
                 )
-            print(output[0].shape)
+            print(output[0].argmax(2))
+            pred = output[0].argmax(2)[:,-1].item()
+            if pred == tokenizer.vocab.stoi[tokenizer.eos_token]:
+                break
+            sentence.insert(-1, pred)
+        for i in range(len(sentence)):
+            sentence[i] = tokenizer.vocab.itos(sentence[i])
+        sentence[i]
+
         break
 
 
@@ -505,12 +513,13 @@ def main(colab_args=None, do_train=True):
     model.to(args.device)
     logger.info("Training/evaluation parameters %s", args)
 
+    val(args, model, test_dataloader)
+
     # Training
     if do_train:
-        global_step, tr_loss = train(args, model, train_dataloader, valid_dataloader)
+        global_step, tr_loss = train(args, model, train_dataloader, test_dataloader)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
     else:
-        val(args, model, test_dataloader)
         inference(args, model, valid_data, tok)
 
 

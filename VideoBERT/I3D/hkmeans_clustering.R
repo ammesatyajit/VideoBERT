@@ -6,7 +6,7 @@ CLUSTERS_PER_LEVEL <- strtoi(args[2])
 print(sprintf("###### LEVELS = %d ######", LEVELS))
 print(sprintf("###### CLUSTERS_PER_LEVEL = %d ######", CLUSTERS_PER_LEVEL))
 
-ROOT_DIR <- sprintf("/home/david/clustering/results/clustering-L%d-C%d", LEVELS, CLUSTERS_PER_LEVEL)
+ROOT_DIR <- sprintf("/home/ammesatyajit/Downloads/clustering-L%d-C%d", LEVELS, CLUSTERS_PER_LEVEL)
 print(sprintf("#### ROOT DIR: %s", ROOT_DIR))
 
 ROOT_DATA_PATH <- file.path("/home/david/clustering/data/small.xdf")

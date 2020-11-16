@@ -315,12 +315,13 @@ def train(args, model, train_dataloader, valid_dataloader) -> Tuple[int, float]:
     return global_step, tr_loss / global_step
 
 
-def inference(args, model, test_dataset, tokenizer):
+def inference(args, model, test_dataset, tokenizer, max_len=50):
     model.eval()
     dataset = tqdm(test_dataset, desc="Testing", disable=args.local_rank not in [-1, 0])
 
     for example in dataset:
-        print(example.src)
+        sentence = [tokenizer.vocab.stoi[tokenizer.init_token], tokenizer.vocab.stoi[example.src[0]], tokenizer.vocab.stoi[example.src[1]]]
+        print(example.src[:3], sentence)
         break
 
 

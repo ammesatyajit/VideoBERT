@@ -320,8 +320,9 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
     dataset = tqdm(test_dataset, desc="Testing", disable=args.local_rank not in [-1, 0])
 
     for example in dataset:
-        sentence = [tokenizer.vocab.stoi[tokenizer.init_token], tokenizer.vocab.stoi[example.src[0]], tokenizer.vocab.stoi[example.src[1]]]
+        sentence = [tokenizer.vocab.stoi[tokenizer.init_token], tokenizer.vocab.stoi[example.src[0]], tokenizer.vocab.stoi[example.src[1]], tokenizer.vocab.stoi[tokenizer.eos_token]]
         for i in range(2):
+            print(sentence)
             inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
             tok_type_ids = torch.zeros_like(inp_tensor).to(args.device)
             attn_mask = (inp_tensor == 1).to(args.device)
@@ -331,7 +332,7 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
                     text_token_type_ids=tok_type_ids,
                     text_attention_mask=attn_mask,
                 )
-            print(output.argmax(2))
+            print(output[0].argmax(2))
         break
 
 

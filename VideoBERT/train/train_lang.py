@@ -339,8 +339,8 @@ def inference(args, model, test_dataset, tokenizer, max_len=50):
                 break
             sentence.insert(-1, pred)
         for i in range(len(sentence)):
-            sentence[i] = tokenizer.vocab.itos(sentence[i])
-        sentence[i]
+            sentence[i] = tokenizer.vocab.itos[sentence[i]]
+        print(sentence)
 
         break
 

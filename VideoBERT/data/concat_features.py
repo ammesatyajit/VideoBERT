@@ -13,8 +13,8 @@ root_features = args.root_feature_path
 save_path = args.features_save_path
 
 features = []
-for root, dirs, files in os.walk(root_features):
-    for name in tqdm(files):
+for root, dirs, files in tqdm(os.walk(root_features)):
+    for name in files:
         path = os.path.join(root, name)
         features.append(np.load(path))
 features_concat = np.concatenate(features)

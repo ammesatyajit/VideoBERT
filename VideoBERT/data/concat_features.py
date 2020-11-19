@@ -24,13 +24,17 @@ save_path = args.features_save_path
 #             features_concat = torch.cat((features_concat, features))
 
 features_concat = []
+counter = 0
 for root, dirs, files in tqdm(os.walk(root_features)):
+    if counter == 40000:
+        print("40000 reached")
+        break
     for name in files:
         path = os.path.join(root, name)
         features = torch.from_numpy(np.load(path)).cuda()
         features_concat.append(features)
+        counter += 1
 
-print("finished reading all features")
 print(features_concat[0].shape)
 features_concat = torch.cat(features_concat)
 print("final size:", features_concat.shape)

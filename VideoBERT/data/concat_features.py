@@ -24,8 +24,7 @@ save_path = args.features_save_path
 #             features_concat = torch.cat((features_concat, features))
 
 features_concat = []
-counter = 0
-for root, dirs, files in tqdm(os.walk(root_features)):
+for counter, (root, dirs, files) in tqdm(enumerate(os.walk(root_features))):
     if counter == 40000:
         print("40000 reached")
         break

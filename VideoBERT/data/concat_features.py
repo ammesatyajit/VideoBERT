@@ -34,7 +34,6 @@ for counter, (root, dirs, files) in tqdm(enumerate(os.walk(root_features))):
         features_concat.append(features)
         counter += 1
 
-print(len(features_concat))
-features_concat = torch.cat(features_concat)
+features_concat = np.array(features_concat)
 print("final size:", features_concat.shape)
 np.save(save_path, features_concat)

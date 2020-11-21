@@ -27,7 +27,7 @@ features_concat = []
 for root, dirs, files in tqdm(os.walk(root_features)):
     for name in files:
         path = os.path.join(root, name)
-        features = np.load(path)
+        features = np.load(path).tolist()
         features_concat.append(features)
 
 features_concat = np.asarray(features_concat)

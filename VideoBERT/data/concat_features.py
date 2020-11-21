@@ -30,6 +30,6 @@ for root, dirs, files in tqdm(os.walk(root_features)):
         features = np.load(path)
         features_concat.append(features)
 
-features_concat = np.array(features_concat)
+features_concat = np.asarray(features_concat)
 print("final size:", features_concat.shape)
 # np.save(save_path, features_concat)

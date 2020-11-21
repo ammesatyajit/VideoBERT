@@ -30,10 +30,10 @@ for counter, (root, dirs, files) in tqdm(enumerate(os.walk(root_features))):
     #     break
     for name in files:
         path = os.path.join(root, name)
-        features = torch.from_numpy(np.load(path))
+        features = np.load(path)
         features_concat.append(features)
         counter += 1
 
 features_concat = np.array(features_concat)
 print("final size:", features_concat.shape)
-np.save(save_path, features_concat)
+# np.save(save_path, features_concat)

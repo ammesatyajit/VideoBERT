@@ -21,8 +21,9 @@ def minibatch_kmeans(root, prefix, k, batch_size, epochs):
     kmeans = MiniBatchKMeans(n_clusters=k, batch_size=batch_size)
     vectors = None
     print("starting kmeans")
-    for i in tqdm(range(epochs)):
-        for path in paths:
+    for i in range(epochs):
+        print("epoch:", i)
+        for path in tqdm(paths):
             if vectors is None:
                 vectors = np.load(path)
             else:

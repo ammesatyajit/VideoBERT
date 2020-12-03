@@ -47,12 +47,15 @@ def main():
                         help='path to folder containing all the video folders with the features')
     parser.add_argument('-p', '--features-prefix', type=str, required=True,
                         help='prefix that contains the desired files to read')
+    parser.add_argument('-b', '--batch-size', type=int, default=500,
+                        help='batch_size of kmeans thing')
     args = parser.parse_args()
 
     root = args.root_feature_path
     prefix = args.features_prefix
+    batch_size = args.batch_size
 
-    centroids, labelled_data = minibatch_kmeans(root, prefix, 12, 20000, 10)
+    centroids, labelled_data = minibatch_kmeans(root, prefix, 12, batch_size, 10)
     print(centroids.shape)
     print(labelled_data.items[0])
 

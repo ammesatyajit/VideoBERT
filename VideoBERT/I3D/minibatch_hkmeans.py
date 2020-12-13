@@ -31,8 +31,9 @@ def minibatch_kmeans(root, prefix, k, batch_size, epochs):
                 vectors = vectors[:batch_size, :]
                 kmeans.partial_fit(vectors)
                 vectors = None
-        if vectors is not None:
+        if vectors is not None and vectors.shape[0] >= k:
             kmeans.partial_fit(vectors)
+            vectors = None
 
     print("labelling data")
     labelled_data = {}

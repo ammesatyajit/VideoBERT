@@ -1,4 +1,4 @@
-torch==1.5.1
+torch~=1.7.1
 setuptools~=28.8.0
 tensorflow>=2.3.0
 numpy~=1.19.0

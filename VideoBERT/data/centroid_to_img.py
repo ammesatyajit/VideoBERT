@@ -25,6 +25,7 @@ def img_path_from_centroid(feature_dir, centroid, img_dir):
                 features_id = path[path.rindex('-') + 1: path.rindex('.')]
                 features_row = np.argmin(centroid_dist)
 
+    print(min_dist)
     return os.path.join(img_dir, vid_id, 'img-{}-{:02}.jpg'.format(features_id, features_row))
 
 

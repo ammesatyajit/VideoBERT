@@ -28,5 +28,6 @@ def img_path_from_centroid(feature_dir, centroid, img_dir):
     return os.path.join(img_dir, vid_id, 'img-{}-{:02}.jpg'.format(features_id, features_row))
 
 
+print(img_path_from_centroid(saved_features, centroids[0], saved_imgs))
 # for i in range(centroids.shape[0]):
 #     centroid_map[i] = img_path_from_centroid(saved_features, centroids[1], saved_imgs)

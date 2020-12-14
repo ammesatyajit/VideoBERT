@@ -1,11 +1,12 @@
 import numpy as np
+import torch
 from tqdm import tqdm
 import os
 import json
 
 saved_features = 'saved_features'
 saved_imgs = 'saved_imgs'
-centroids = np.load('centroids.npy')
+centroids = torch.from_numpy(np.load('centroids.npy')).cuda()
 centroid_map = {}
 
 
@@ -18,13 +19,13 @@ def img_path_from_centroid(feature_dir, centroid, img_dir):
     for root, dirs, files in os.walk(feature_dir):
         for name in files:
             path = os.path.join(root, name)
-            features = np.load(path)
-            centroid_dist = np.linalg.norm(features - centroid, axis=1)
-            if np.min(centroid_dist) < min_dist:
-                min_dist = np.min(centroid_dist)
+            features = torch.from_numpy(np.load(path)).cuda()
+            centroid_dist = torch.linalg.norm(features - centroid, axis=1)
+            if torch.min(centroid_dist) < min_dist:
+                min_dist = torch.min(centroid_dist)
                 vid_id = path[path.index('/') + 1: path.rindex('/')]
                 features_id = path[path.rindex('-') + 1: path.rindex('.')]
-                features_row = np.argmin(centroid_dist)
+                features_row = torch.argmin(centroid_dist)
 
     return os.path.join(img_dir, vid_id, 'img-{}-{:02}.jpg'.format(features_id, features_row))
 

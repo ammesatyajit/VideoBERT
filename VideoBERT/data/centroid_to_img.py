@@ -30,6 +30,6 @@ def img_path_from_centroid(feature_dir, centroid, img_dir):
 
 
 for i in tqdm(range(centroids.shape[0])):
-    centroid_map[i] = img_path_from_centroid(saved_features, centroids[1], saved_imgs)
+    centroid_map[i] = img_path_from_centroid(saved_features, centroids[i], saved_imgs)
 
 json.dump(centroid_map, open('centroid_to_img.json', 'wb'), sort_keys=True, indent=4)

@@ -27,7 +27,7 @@ def img_path_from_centroid(features, centroid, img_dir):
     features_id = None
     features_row = None
 
-    for i in tqdm(range(counter)):
+    for i in range(counter):
         centroid_dist = np.linalg.norm(features[i] - centroid, axis=1)
         if np.min(centroid_dist) < min_dist:
             path = feature_paths[i]
@@ -39,8 +39,7 @@ def img_path_from_centroid(features, centroid, img_dir):
     return os.path.join(img_dir, vid_id, 'img-{}-{:02}.jpg'.format(features_id, features_row))
 
 
-for i in range(centroids.shape[0]):
-    print("Centroid:", i)
+for i in tqdm(range(centroids.shape[0])):
     centroid_map[i] = img_path_from_centroid(feature_list, centroids[i], saved_imgs)
 
 json.dump(centroid_map, open('centroid_to_img.json', 'wb'), sort_keys=True, indent=4)

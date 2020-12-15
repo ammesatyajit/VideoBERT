@@ -16,7 +16,7 @@ counter = 0
 for root, dirs, files in tqdm(os.walk(saved_features)):
     for name in files:
         path = os.path.join(root, name)
-        feature_list.append(torch.from_numpy(np.load(path)).cuda())
+        feature_list.append(torch.from_numpy(np.load(path)))
         feature_paths[counter] = path
         counter += 1
 
@@ -28,7 +28,7 @@ def img_path_from_centroid(features, centroid, img_dir):
     features_row = None
 
     for i in tqdm(range(counter)):
-        centroid_dist = torch.linalg.norm(features[i] - centroid.cuda(), axis=1)
+        centroid_dist = torch.linalg.norm(features[i].cuda() - centroid.cuda(), axis=1)
         if torch.min(centroid_dist) < min_dist:
             feature_path = feature_paths[i]
             min_dist = torch.min(centroid_dist)

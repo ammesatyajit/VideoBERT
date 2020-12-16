@@ -7,18 +7,13 @@ import json
 saved_features = 'saved_features'
 saved_imgs = 'saved_imgs'
 centroids = np.load('centroids.npy')
+save_path = 'centroid_to_img.json'
 centroid_map = {}
 
 feature_paths = {}
 feature_list = []
 
 counter = 0
-for root, dirs, files in tqdm(os.walk(saved_features)):
-    for name in files:
-        path = os.path.join(root, name)
-        feature_list.append(np.load(path))
-        feature_paths[counter] = path
-        counter += 1
 
 
 def img_path_from_centroid(features, centroid, img_dir):
@@ -39,7 +34,26 @@ def img_path_from_centroid(features, centroid, img_dir):
     return os.path.join(img_dir, vid_id, 'img-{}-{:02}.jpg'.format(features_id, features_row))
 
 
-for i in tqdm(range(centroids.shape[0])):
-    centroid_map[i] = img_path_from_centroid(feature_list, centroids[i], saved_imgs)
+for root, dirs, files in tqdm(os.walk(saved_features)):
+    for name in files:
+        path = os.path.join(root, name)
+        feature_list.append(np.load(path))
+        feature_paths[counter] = path
+        counter += 1
 
-json.dump(centroid_map, open('centroid_to_img.json', 'w'), sort_keys=True, indent=4)
+start_id = 0
+try:
+    centroid_map = json.load(open(save_path, 'r'))
+    start_id = len(centroid_map)
+    print('starting at centroid', start_id)
+except:
+    print('starting with empty centroid_map')
+
+for i in tqdm(range(start_id, centroids.shape[0])):
+    try:
+        centroid_map[str(i)] = img_path_from_centroid(feature_list, centroids[i], saved_imgs)
+    except KeyboardInterrupt:
+        break
+
+print('saving centroids and corresponding images')
+json.dump(centroid_map, open(save_path, 'w'), sort_keys=True, indent=4)

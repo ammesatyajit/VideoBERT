@@ -15,13 +15,10 @@ save_path = 'labelled_data.json'
 
 data_dict = {}
 
-# for folder in tqdm(dirs):
-folder = dirs[0]
-data_dict[folder] = []
-feature_files = sorted(os.listdir(os.path.join(features_root, folder)))
-print(feature_files)
-for features in feature_files:
-    data_dict[folder].extend(kmeans.predict(np.load(os.path.join(features_root, folder, features))))
+for folder in tqdm(dirs):
+    data_dict[folder] = []
+    feature_files = sorted(os.listdir(os.path.join(features_root, folder)))
+    for features in feature_files:
+        data_dict[folder].extend(kmeans.predict(np.load(os.path.join(features_root, folder, features))))
 
-print(data_dict)
-# json.dump(data_dict, open(save_path, 'w'), sort_keys=True, indent=4)
+json.dump(data_dict, open(save_path, 'w'), sort_keys=True, indent=4)

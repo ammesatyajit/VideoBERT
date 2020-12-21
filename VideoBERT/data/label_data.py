@@ -20,6 +20,6 @@ for folder in tqdm(dirs):
     feature_files = sorted(os.listdir(os.path.join(features_root, folder)))
     for features in feature_files:
         data_dict[folder].extend(kmeans.predict(np.load(os.path.join(features_root, folder, features))))
-    data_dict[folder] = map(lambda x: int(x), data_dict[folder])
+    data_dict[folder] = list(map(lambda x: int(x), data_dict[folder]))
 
 json.dump(data_dict, open(save_path, 'w'), sort_keys=True, indent=4)

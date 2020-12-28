@@ -23,5 +23,5 @@ quantized_tile = concat_tile([quantized_imgs[20:25],
                               quantized_imgs[25:30],
                               quantized_imgs[30:35],
                               quantized_imgs[35:40]])
-cv2.imwrite('real_imgs.jpg', real_tile)
-cv2.imwrite('quantized_imgs.jpg', quantized_tile)
+cv2.imwrite('~/satyajit_drive/real_imgs.jpg', real_tile)
+cv2.imwrite('~/satyajit_drive/quantized_imgs.jpg', quantized_tile)

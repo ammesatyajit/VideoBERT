@@ -1,6 +1,14 @@
 import os
 import json
 import cv2
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--vid-id', type=str, required=True,
+                    help='video id to show images for')
+args = parser.parse_args()
+
+vid_id = args.vid_id
 
 
 def concat_tile(im_list_2d):
@@ -9,7 +17,6 @@ def concat_tile(im_list_2d):
 
 centroid_map = json.load(open('centroid_to_img.json', 'r'))
 data = json.load(open('labelled_data.json', 'r'))
-vid_id = 'H48wVDWXa-g'
 
 real_imgs = [cv2.imread(os.path.join('saved_imgs', vid_id, file)) for file in sorted(os.listdir(os.path.join('saved_imgs', vid_id)))]
 quantized_imgs = [cv2.imread(centroid_map[str(centroid)]) for centroid in data[vid_id]]

@@ -13,7 +13,7 @@ data = json.load(open('labelled_data.json', 'r'))
 vid_id = 'rl6i8bTPk3Q'
 
 real_imgs = [cv2.imread(file) for file in os.listdir(os.path.join('saved_imgs', vid_id))]
-quantized_imgs = [cv2.imread(centroid_map[centroid]) for centroid in data[vid_id]]
+quantized_imgs = [cv2.imread(centroid_map[str(centroid)]) for centroid in data[vid_id]]
 
 real_tile = concat_tile([real_imgs[20:25],
                          real_imgs[25:30],

@@ -24,9 +24,8 @@ quantized_imgs = [cv2.imread(centroid_map[str(centroid)]) for centroid in data[v
 #                               quantized_imgs[30:35],
 #                               quantized_imgs[35:40]])
 
-print(len(real_imgs))
-print(len(quantized_imgs))
 real_tile = cv2.hconcat(real_imgs[20:40])
 quantized_tile = cv2.hconcat(quantized_imgs[20:40])
+print(real_tile.shape, quantized_tile.shape)
 cv2.imwrite('real_imgs.jpg', real_tile)
 cv2.imwrite('quantized_imgs.jpg', quantized_tile)

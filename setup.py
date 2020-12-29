@@ -19,7 +19,8 @@ setuptools.setup(
         "torch",
         "tensorflow_hub",
         "opencv-python",
-        "torchvision"
+        "torchvision",
+        "punctuator"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

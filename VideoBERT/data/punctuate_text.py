@@ -22,7 +22,9 @@ start.append(end[-2])
 end.insert(0, start[1])
 
 punc_text = [sentence.strip() + '.' for sentence in punc.punctuate(' '.join(text)).split('.') if sentence != '']
-print(punc_text)
+print(text)
+print(start)
+print(end)
 
 text_len = [len(phrase.split(' ')) for phrase in text]
 text_len = [sum(text_len[:i]) for i in range(len(text_len) + 1)]

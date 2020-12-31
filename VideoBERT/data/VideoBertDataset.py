@@ -1,4 +1,7 @@
+from abc import ABC
+
 from torch.utils.data import Dataset
+import torchtext
 from transformers import BertTokenizer
 from torch.nn.utils.rnn import pad_sequence
 import torch
@@ -6,10 +9,83 @@ import os
 import numpy as np
 import random
 import pandas as pd
+import json
 import VideoBERT.data.globals as data_globals
 
 
 class VideoBertDataset(Dataset):
+    def __init__(self, tokenizer, data_path):
+        self.data_path = data_path
+        self.data = json.load(open(self.data_path, 'r'))
+        self.tokenizer = tokenizer
+        self.setup_data()
+        self.setup_tokenizer()
+
+    def setup_data(self):
+        self.tokenizer.sep_token = '<sep>'
+        examples = [[self.tokenizer.sep_token]]
+        for _, values in self.data.items():
+            examples.extend(values)
+        self.data = examples
+
+    def setup_tokenizer(self):
+        vocab_data = []
+        for example in self.data:
+            vocab_data.append(self.tokenizer.tokenize(example['text']))
+        self.tokenizer.build_vocab(vocab_data)
+
+    def create_text_example(self, i):
+        sentence = self.data[i]['text']
+        sentence = [self.tokenizer.vocab.stoi[token] for token in self.tokenizer.tokenize(sentence)]
+        sentence.insert(0, self.tokenizer.vocab.stoi[self.tokenizer.init_token])
+        sentence.append(self.tokenizer.vocab.stoi[self.tokenizer.eos_token])
+
+        text_ids = torch.LongTensor(sentence)
+        text_tok_type_ids = torch.zeros_like(text_ids)
+        text_attn_mask = text_ids == self.tokenizer.vocab.stoi[self.tokenizer.pad_token]
+
+        return text_ids, text_tok_type_ids, text_attn_mask
+
+    def create_video_example(self, i):
+        vid_ids = self.data[i]['vid_ids']
+        vid_ids = [vid_id + len(self.tokenizer.vocab) for vid_id in vid_ids]
+        vid_ids.insert(0, self.tokenizer.vocab.stoi[self.tokenizer.init_token])
+        vid_ids.append(self.tokenizer.vocab.stoi[self.tokenizer.eos_token])
+
+        vid_ids = torch.LongTensor(vid_ids)
+        vid_tok_type_ids = torch.ones_like(vid_ids)
+        vid_attn_mask = vid_ids == self.tokenizer.vocab.stoi[self.tokenizer.pad_token]
+
+        return vid_ids, vid_tok_type_ids, vid_attn_mask
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, item):
+        text_ids, text_tok_type_ids, text_attn_mask = self.create_text_example(item)
+        vid_ids, vid_tok_type_ids, vid_attn_mask = self.create_video_example(item)
+
+        joint_ids = torch.hstack([text_ids[:-1],
+                                  torch.LongTensor([self.tokenizer.vocab.stoi[self.tokenizer.sep_token]]),
+                                  vid_ids[1:]])
+
+        joint_tok_type_ids = torch.hstack([text_tok_type_ids,
+                                           vid_tok_type_ids[1:]])
+
+        joint_attn_mask = joint_ids == self.tokenizer.vocab.stoi[self.tokenizer.pad_token]
+
+        return text_ids, \
+               text_tok_type_ids, \
+               text_attn_mask, \
+               vid_ids, \
+               vid_tok_type_ids, \
+               vid_attn_mask, \
+               joint_ids, \
+               joint_tok_type_ids, \
+               joint_attn_mask
+
+
+class VideoBertDatasetOld(Dataset):
     def __init__(self, tokenizer, data_path):
         self.data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), data_path)
         self.data = pd.read_csv(self.data_path, delimiter=',')

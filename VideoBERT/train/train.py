@@ -1,21 +1,3 @@
-# coding=utf-8
-# Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.
-# Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-
-# This code is based on code from https://github.com/huggingface/transformers
 
 import argparse
 import glob
@@ -49,7 +31,7 @@ from transformers import (
 import VideoBERT.data.globals as data_globals
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
 from VideoBERT.train.model_utils import *
-from VideoBERT.data.VideoBertDataset import VideoBertDataset
+from VideoBERT.data.VideoBertDataset import VideoBertDatasetOld
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -533,7 +515,7 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
+    train_dataset = VideoBertDatasetOld(tokenizer, data_path=args.data_path)
 
     global_step, tr_loss = train(args, train_dataset, model, tokenizer)
     logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)

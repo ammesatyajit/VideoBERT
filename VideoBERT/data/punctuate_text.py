@@ -6,7 +6,8 @@ punc = Punctuator('model.pcl')
 captions = json.load(open('filtered_captions.json', 'r'))
 labelled_data = json.load(open('labelled_data.json', 'r'))
 vid_ids = os.listdir('saved_features')
-punctuated_data = {}
+train_data = {}
+eval_data = {}
 
 
 def timestamp_to_idx(time):

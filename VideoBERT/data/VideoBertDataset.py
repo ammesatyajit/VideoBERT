@@ -1,25 +1,23 @@
-from abc import ABC
-
-from torch.utils.data import Dataset
-import torchtext
-from transformers import BertTokenizer
-from torch.nn.utils.rnn import pad_sequence
-import torch
-import os
-import numpy as np
-import random
-import pandas as pd
 import json
+import os
+import random
+
+import numpy as np
+import pandas as pd
+import torch
+from torch.utils.data import Dataset
+
 import VideoBERT.data.globals as data_globals
 
 
 class VideoBertDataset(Dataset):
-    def __init__(self, tokenizer, data_path):
+    def __init__(self, tokenizer, data_path, build_tokenizer=True):
         self.data_path = data_path
         self.data = json.load(open(self.data_path, 'r'))
         self.tokenizer = tokenizer
         self.setup_data()
-        self.setup_tokenizer()
+        if build_tokenizer:
+            self.setup_tokenizer()
 
     def setup_data(self):
         self.tokenizer.sep_token = '<sep>'

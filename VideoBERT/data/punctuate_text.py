@@ -5,7 +5,7 @@ from punctuator import Punctuator
 punc = Punctuator('model.pcl')
 captions = json.load(open('filtered_captions.json', 'r'))
 labelled_data = json.load(open('labelled_data.json', 'r'))
-vid_ids = os.listdir('saved_imgs')
+vid_ids = os.listdir('saved_features')
 punctuated_data = {}
 
 
@@ -44,10 +44,10 @@ def punc_text_and_timestamp(text, start, end):
     return out
 
 
-text = captions[vid_ids[0]]['text']
-start = captions[vid_ids[0]]['start']
-end = captions[vid_ids[0]]['end']
-start.append(end[-2])
-end.insert(0, start[1])
+raw_text = captions[vid_ids[0]]['text']
+start_list = captions[vid_ids[0]]['start']
+end_list = captions[vid_ids[0]]['end']
+start_list.append(end_list[-2])
+end_list.insert(0, start_list[1])
 
-print(punc_text_and_timestamp(text, start, end))
+print(punc_text_and_timestamp(raw_text, start_list, end_list))

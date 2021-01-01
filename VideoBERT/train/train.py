@@ -305,9 +305,6 @@ def train(args, model, train_dataset: VideoBertDataset) -> Tuple[int, float]:
                     torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
                     logger.info("Saving optimizer and scheduler states to %s", output_dir)
 
-                    torch.save(train_dataset.tokenizer, os.path.join(output_dir, "tokenizer.pt"))
-                    logger.info("Saving tokenizer to %s", output_dir)
-
             if 0 < args.max_steps < global_step:
                 epoch_iterator.close()
                 break
@@ -474,7 +471,10 @@ def main(colab_args=None):
     # Training
     train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
 
-    global_step, tr_loss = train(args, train_dataset, model, tokenizer)
+    torch.save(train_dataset.tokenizer, os.path.join(args.output_dir, "tokenizer.pt"))
+    logger.info("Saving tokenizer to %s", args.output_dir)
+
+    global_step, tr_loss = train(args, model, train_dataset)
     logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
 

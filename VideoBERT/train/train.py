@@ -1,3 +1,8 @@
+from VideoBERT.evaluation.eval import evaluate
+from VideoBERT.train.custom_vid_transformer import VideoTransformer
+from VideoBERT.data.VideoBertDataset import VideoBertDataset
+from VideoBERT.train.model_utils import *
+
 import argparse
 import glob
 import logging
@@ -19,10 +24,6 @@ from transformers import (
 )
 
 spacy_en = spacy.load('en')
-
-from VideoBERT.train.custom_vid_transformer import VideoTransformer
-from VideoBERT.data.VideoBertDataset import VideoBertDataset
-from VideoBERT.train.model_utils import *
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -83,7 +84,7 @@ def _rotate_checkpoints(args, checkpoint_prefix="checkpoint", use_mtime=False) -
         shutil.rmtree(checkpoint)
 
 
-def train(args, model, train_dataset: VideoBertDataset) -> Tuple[int, float]:
+def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertDataset) -> Tuple[int, float]:
     """ Train the model """
     # will graph summary of training and eval at the end of each epoch
     tb_writer = SummaryWriter()
@@ -286,6 +287,12 @@ def train(args, model, train_dataset: VideoBertDataset) -> Tuple[int, float]:
                     logging_loss = tr_loss
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
+                    total_eval_loss, text_eval_loss, video_eval_loss, joint_eval_loss = evaluate(args, model, eval_dataset)
+                    print("Benchmark Eval:\n"
+                          "Total: {}\n"
+                          "Text: {}\n"
+                          "Video: {}\n"
+                          "Joint: {}\n".format(total_eval_loss, text_eval_loss, video_eval_loss, joint_eval_loss))
                     model.train()
                     checkpoint_prefix = "checkpoint"
                     # Save model checkpoint
@@ -340,10 +347,16 @@ def main(colab_args=None):
             help="The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.",
         )
         parser.add_argument(
-            "--data_path",
+            "--train_data_path",
             default=None,
             type=str,
-            help="The csv file for training the model"
+            help="The json file for training the model"
+        )
+        parser.add_argument(
+            "--eval_data_path",
+            default=None,
+            type=str,
+            help="The json file for evaluating the model"
         )
         parser.add_argument(
             "--config_name",
@@ -448,11 +461,16 @@ def main(colab_args=None):
     set_seed(args)
 
     # setup tokenizer and model
-    tokenizer = Field(tokenize=tokenize_en,
-                      init_token='<sos>',
-                      eos_token='<eos>',
-                      lower=True,
-                      batch_first=True)
+    if os.path.exists(os.path.join(args.output_dir, "tokenizer.pt")):
+        new_tokenizer = False
+        tokenizer = torch.load(os.path.join(args.output_dir, "tokenizer.pt"))
+    else:
+        new_tokenizer = True
+        tokenizer = Field(tokenize=tokenize_en,
+                          init_token='<sos>',
+                          eos_token='<eos>',
+                          lower=True,
+                          batch_first=True)
 
     if args.model_name_or_path is None:
         # start from inital model
@@ -469,12 +487,24 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    train_dataset = VideoBertDataset(tokenizer, data_path=args.data_path)
+    train_dataset = VideoBertDataset(tokenizer, build_tokenizer=new_tokenizer, data_path=args.train_data_path)
+    eval_dataset = VideoBertDataset(train_dataset.tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
 
-    torch.save(train_dataset.tokenizer, os.path.join(args.output_dir, "tokenizer.pt"))
-    logger.info("Saving tokenizer to %s", args.output_dir)
+    if new_tokenizer:
+        torch.save(train_dataset.tokenizer, os.path.join(args.output_dir, "tokenizer.pt"))
+        logger.info("Saving tokenizer to %s", args.output_dir)
 
-    global_step, tr_loss = train(args, model, train_dataset)
+    # Benchmark Evaluation
+    total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
+    print("Benchmark Eval:\n"
+          "Total: {}\n"
+          "Text: {}\n"
+          "Video: {}\n"
+          "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
+
+    # Start Training
+    model.train()
+    global_step, tr_loss = train(args, model, train_dataset, eval_dataset)
     logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
 
 

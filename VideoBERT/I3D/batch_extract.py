@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--file-list-path', type=str, required=True, help='path to file containing video file names')
 parser.add_argument('-r', '--root-video-path', type=str, required=True, help='root directory containing video files')
 parser.add_argument('-s', '--features-save-path', type=str, required=True, help='directory in which to save features')
-parser.add_argument('-o', '--imgs-save-path', type=str, required=True, help='directory in which to save images')
+parser.add_argument('-i', '--imgs-save-path', type=str, required=True, help='directory in which to save images')
 args = parser.parse_args()
 
 video_file_list_path = args.file_list_path

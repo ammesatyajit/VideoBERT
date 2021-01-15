@@ -34,6 +34,10 @@ print(len(video_paths), 'video paths found.')
 from_index = 0
 
 for i, path in enumerate(video_paths[from_index:]):
+    if os.path.exists(path):
+        print(path, "Already exists, moving on to next folder")
+        continue
+
     try:
         print('processing:', path, '[{}/{}]'.format(i+1, len(video_paths[from_index:])))
 

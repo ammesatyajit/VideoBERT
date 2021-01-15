@@ -34,9 +34,6 @@ print(len(video_paths), 'video paths found.')
 from_index = 0
 
 for i, path in enumerate(video_paths[from_index:]):
-    if os.path.exists(path):
-        print(path, "Already exists, moving on to next folder")
-        continue
 
     try:
         print('processing:', path, '[{}/{}]'.format(i+1, len(video_paths[from_index:])))
@@ -44,6 +41,10 @@ for i, path in enumerate(video_paths[from_index:]):
         folder_name = os.path.splitext(os.path.basename(path))[0]
         specific_feature_save_path = os.path.join(features_save_path, folder_name)
         specific_img_save_path = os.path.join(imgs_save_path, folder_name)
+
+        if os.path.exists(specific_feature_save_path):
+            print(specific_feature_save_path, "Already exists, moving on to next folder")
+            continue
 
         pathlib.Path(specific_feature_save_path).mkdir(parents=True, exist_ok=True)
         pathlib.Path(specific_img_save_path).mkdir(parents=True, exist_ok=True)

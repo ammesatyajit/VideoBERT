@@ -23,13 +23,14 @@ def img_path_from_centroid(features, centroid, img_dir):
     features_row = None
 
     for i in range(counter):
-        centroid_dist = np.linalg.norm(features[i] - centroid, axis=1)
-        if np.min(centroid_dist) < min_dist:
+        centroid_dist = torch.linalg.norm(torch.from_numpy(features[i] - centroid).cuda(), axis=1)
+        centroid_min_dist = torch.min(centroid_dist)
+        if centroid_min_dist < min_dist:
             path = feature_paths[i]
-            min_dist = np.min(centroid_dist)
+            min_dist = centroid_min_dist
             vid_id = path[path.index('/') + 1: path.rindex('/')]
             features_id = path[path.rindex('-') + 1: path.rindex('.')]
-            features_row = np.argmin(centroid_dist)
+            features_row = torch.argmin(centroid_dist)
 
     return os.path.join(img_dir, vid_id, 'img-{}-{:02}.jpg'.format(features_id, features_row))
 

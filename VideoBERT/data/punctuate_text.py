@@ -1,9 +1,17 @@
 import json
 import os
 from punctuator import Punctuator
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--captions-path', type=str, required=True,
+                    help='path to unfiltered captions')
+args = parser.parse_args()
+
+captions_path = args.captions_path
 
 punc = Punctuator('model.pcl')
-captions = json.load(open('filtered_captions.json', 'r'))
+captions = json.load(open(captions_path, 'r'))
 labelled_data = json.load(open('labelled_data.json', 'r'))
 vid_ids = os.listdir('saved_features')
 train_data = {}

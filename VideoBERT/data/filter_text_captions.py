@@ -19,11 +19,11 @@ filtered_captions = {}
 
 with open(captions_path, 'r') as input_file:
     captions_json = ijson.kvitems(input_file, '')
-    try:
-        for vid_id, captions in tqdm(captions_json):
+    for vid_id, captions in tqdm(captions_json):
+        try:
             if vid_id in ids:
                 filtered_captions[vid_id] = captions
-    except ijson.common.IncompleteJSONError:
-        print('nan detected, moving on')
+        except:
+            print('nan detected, moving on')
 
 json.dump(filtered_captions, open(save_path, 'w'))

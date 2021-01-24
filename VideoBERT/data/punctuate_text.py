@@ -1,5 +1,6 @@
 import json
 import os
+from tqdm import tqdm
 from punctuator import Punctuator
 import argparse
 
@@ -15,7 +16,6 @@ captions = json.load(open(captions_path, 'r'))
 labelled_data = json.load(open('labelled_data.json', 'r'))
 vid_ids = os.listdir('saved_features')
 train_data = {}
-eval_data = {}
 
 
 def timestamp_to_idx(time):
@@ -24,9 +24,6 @@ def timestamp_to_idx(time):
 
 def punc_text_and_timestamp(text, start, end):
     punc_text = [sentence.strip() + '.' for sentence in punc.punctuate(' '.join(text)).split('.') if sentence != '']
-    print(text)
-    print(start)
-    print(end)
 
     text_len = [len(phrase.split(' ')) for phrase in text]
     text_len = [sum(text_len[:i]) for i in range(len(text_len) + 1)]
@@ -53,10 +50,13 @@ def punc_text_and_timestamp(text, start, end):
     return out
 
 
-raw_text = captions[vid_ids[1]]['text']
-start_list = captions[vid_ids[1]]['start']
-end_list = captions[vid_ids[1]]['end']
-start_list.append(end_list[-2])
-end_list.insert(0, start_list[1])
+for vid_id in tqdm(vid_ids):
+    raw_text = captions[vid_id]['text']
+    start_list = captions[vid_id]['start']
+    end_list = captions[vid_id]['end']
+    start_list.append(end_list[-2])
+    end_list.insert(0, start_list[1])
 
-print(punc_text_and_timestamp(raw_text, start_list, end_list))
+    train_data[vid_id] = punc_text_and_timestamp(raw_text, start_list, end_list)
+
+json.dump(train_data, open('training_data.json'))

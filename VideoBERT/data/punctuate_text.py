@@ -56,5 +56,7 @@ def punc_text_and_timestamp(text, start, end):
 raw_text = captions[vid_ids[1]]['text']
 start_list = captions[vid_ids[1]]['start']
 end_list = captions[vid_ids[1]]['end']
+start_list.append(end_list[-2])
+end_list.insert(0, start_list[1])
 
 print(punc_text_and_timestamp(raw_text, start_list, end_list))

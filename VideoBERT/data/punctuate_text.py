@@ -22,7 +22,7 @@ def timestamp_to_idx(time):
     return int(0.5 + time / 1.5)
 
 
-def punc_text_and_timestamp(text, start, end, vid_id):
+def punc_text_and_timestamp(text, start, end, vid_idx):
     punc_text = [sentence.strip() + '.' for sentence in punc.punctuate(' '.join(text)).split('.') if sentence != '']
 
     text_len = [len(phrase.split(' ')) for phrase in text]
@@ -43,9 +43,10 @@ def punc_text_and_timestamp(text, start, end, vid_id):
                 end_idx = j
                 break
 
+        print(start[start_idx], end[end_idx])
         out.append({'sentence': punc_text[i],
-                    'vid_tokens': labelled_data[vid_id][timestamp_to_idx(start[start_idx]):
-                                                        timestamp_to_idx(end[end_idx])]})
+                    'vid_tokens': labelled_data[vid_idx][timestamp_to_idx(start[start_idx]):
+                                                         timestamp_to_idx(end[end_idx])]})
 
     return out
 

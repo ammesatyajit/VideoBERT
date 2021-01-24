@@ -5,7 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--captions-path', type=str, required=True,
-                    help='path to unfiltered captions')
+                    help='path to filtered captions')
 args = parser.parse_args()
 
 captions_path = args.captions_path
@@ -48,7 +48,7 @@ def punc_text_and_timestamp(text, start, end):
         print(punc_text[i] + ':', start[start_idx], end[end_idx])
         out.append({'sentence': punc_text[i],
                     'vid_tokens': labelled_data[vid_ids[0]][timestamp_to_idx(start[start_idx]):
-                                                            timestamp_to_idx(end[end_idx]) + 1]})
+                                                            timestamp_to_idx(end[end_idx])]})
 
     return out
 

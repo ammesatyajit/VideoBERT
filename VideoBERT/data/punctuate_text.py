@@ -51,17 +51,12 @@ def punc_text_and_timestamp(text, start, end):
 
 
 for vid_id in tqdm(vid_ids):
-    try:
-        raw_text = captions[vid_id]['text']
-        start_list = captions[vid_id]['start']
-        end_list = captions[vid_id]['end']
-        start_list.append(end_list[-2])
-        end_list.insert(0, start_list[1])
+    raw_text = captions[vid_id]['text']
+    start_list = captions[vid_id]['start']
+    end_list = captions[vid_id]['end']
+    start_list.append(end_list[-2])
+    end_list.insert(0, start_list[1])
 
-        train_data[vid_id] = punc_text_and_timestamp(raw_text, start_list, end_list)
-    except KeyboardInterrupt:
-        print("keyboard interrupt exitting")
-    except Exception as e:
-        print(e, "error was thrown, moving on")
+    train_data[vid_id] = punc_text_and_timestamp(raw_text, start_list, end_list)
 
 json.dump(train_data, open('training_data.json'))

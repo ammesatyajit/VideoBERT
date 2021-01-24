@@ -53,10 +53,8 @@ def punc_text_and_timestamp(text, start, end):
     return out
 
 
-raw_text = captions[vid_ids[0]]['text']
-start_list = captions[vid_ids[0]]['start']
-end_list = captions[vid_ids[0]]['end']
-start_list.append(end_list[-2])
-end_list.insert(0, start_list[1])
+raw_text = captions[vid_ids[1]]['text']
+start_list = captions[vid_ids[1]]['start']
+end_list = captions[vid_ids[1]]['end']
 
 print(punc_text_and_timestamp(raw_text, start_list, end_list))

@@ -33,8 +33,8 @@ def punc_text_and_timestamp(text, start, end, vid_idx):
     out = []
 
     for i in range(len(punc_text)):
-        start_idx = None
-        end_idx = None
+        start_idx = 0
+        end_idx = -1
         for j in range(len(text)):
             if punc_len[i] >= text_len[j]:
                 start_idx = j
@@ -43,7 +43,6 @@ def punc_text_and_timestamp(text, start, end, vid_idx):
                 end_idx = j
                 break
 
-        print(start[start_idx], end[end_idx])
         out.append({'sentence': punc_text[i],
                     'vid_tokens': labelled_data[vid_idx][timestamp_to_idx(start[start_idx]):
                                                          timestamp_to_idx(end[end_idx])]})

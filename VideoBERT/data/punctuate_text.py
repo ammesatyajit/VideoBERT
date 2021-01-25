@@ -59,4 +59,4 @@ for vid_id in tqdm(vid_ids):
 
     train_data[vid_id] = punc_text_and_timestamp(raw_text, start_list, end_list, vid_id)
 
-json.dump(train_data, open('training_data.json'))
+json.dump(train_data, open('training_data.json', 'w'))

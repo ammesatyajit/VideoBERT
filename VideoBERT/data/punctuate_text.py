@@ -51,12 +51,17 @@ def punc_text_and_timestamp(text, start, end, vid_idx):
 
 
 for vid_id in tqdm(vid_ids):
-    raw_text = captions[vid_id]['text']
-    start_list = captions[vid_id]['start']
-    end_list = captions[vid_id]['end']
-    start_list.append(end_list[-2])
-    end_list.insert(0, start_list[1])
+    try:
+        raw_text = captions[vid_id]['text']
+        start_list = captions[vid_id]['start']
+        end_list = captions[vid_id]['end']
+        start_list.append(end_list[-2])
+        end_list.insert(0, start_list[1])
 
-    train_data[vid_id] = punc_text_and_timestamp(raw_text, start_list, end_list, vid_id)
+        train_data[vid_id] = punc_text_and_timestamp(raw_text, start_list, end_list, vid_id)
+    except KeyboardInterrupt:
+        print('saving already grouped training data')
+        break
+
 
 json.dump(train_data, open('training_data.json', 'w'))

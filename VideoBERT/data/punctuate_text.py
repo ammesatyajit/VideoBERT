@@ -10,12 +10,20 @@ parser.add_argument('-c', '--captions-path', type=str, required=True,
 args = parser.parse_args()
 
 captions_path = args.captions_path
+save_path = 'training_data.json'
 
 punc = Punctuator('model.pcl')
 captions = json.load(open(captions_path, 'r'))
 labelled_data = json.load(open('labelled_data.json', 'r'))
 vid_ids = os.listdir('saved_features')
-train_data = {}
+
+start = 0
+if os.path.exists(save_path):
+    train_data = json.load(open(save_path))
+    print('starting from vid id', len(train_data))
+    start = len(train_data)
+else:
+    train_data = {}
 
 
 def timestamp_to_idx(time):
@@ -50,7 +58,8 @@ def punc_text_and_timestamp(text, start, end, vid_idx):
     return out
 
 
-for vid_id in tqdm(vid_ids):
+for i in tqdm(range(start, len(vid_ids))):
+    vid_id = vid_ids[i]
     try:
         raw_text = captions[vid_id]['text']
         start_list = captions[vid_id]['start']
@@ -64,4 +73,4 @@ for vid_id in tqdm(vid_ids):
         break
 
 
-json.dump(train_data, open('training_data.json', 'w'))
+json.dump(train_data, open(save_path, 'w'))

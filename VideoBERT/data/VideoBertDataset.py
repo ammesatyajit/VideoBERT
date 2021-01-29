@@ -4,6 +4,7 @@ import random
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import torch
 from torch.utils.data import Dataset
 
@@ -28,9 +29,11 @@ class VideoBertDataset(Dataset):
 
     def setup_tokenizer(self):
         vocab_data = [self.tokenizer.sep_token]
-        for example in self.data:
+        print('setting up tokenizer')
+        for example in tqdm(self.data):
             vocab_data.append(self.tokenizer.tokenize(example['sentence']))
         self.tokenizer.build_vocab(vocab_data)
+        print('tokenizer set up successfully')
 
     def create_text_example(self, i):
         sentence = self.data[i]['sentence']

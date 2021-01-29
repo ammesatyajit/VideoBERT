@@ -101,7 +101,7 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
     eval_iterator = tqdm(eval_dataloader, desc="Iteration")
 
     for step, \
-        text_ids, \
+        [text_ids, \
         text_type_ids, \
         text_attn_mask, \
         video_ids, \
@@ -109,7 +109,7 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         video_attn_mask, \
         joint_ids, \
         joint_type_ids, \
-        joint_attn_mask in enumerate(eval_iterator):
+        joint_attn_mask] in enumerate(eval_iterator):
 
         torch.cuda.empty_cache()
 

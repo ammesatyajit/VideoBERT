@@ -126,15 +126,15 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
         padded_joint_type_ids = pad_sequence(joint_type_ids, batch_first=True, padding_value=1)
         padded_joint_attn_mask = padded_joint_ids == pad_id
 
-        return padded_text_ids, \
-               padded_text_type_ids, \
-               padded_text_attn_mask, \
-               padded_video_ids, \
-               padded_video_type_ids, \
-               padded_video_attn_mask, \
-               padded_joint_ids, \
-               padded_joint_type_ids, \
-               padded_joint_attn_mask
+        return padded_text_ids.to(args.device), \
+               padded_text_type_ids.to(args.device), \
+               padded_text_attn_mask.to(args.device), \
+               padded_video_ids.to(args.device), \
+               padded_video_type_ids.to(args.device), \
+               padded_video_attn_mask.to(args.device), \
+               padded_joint_ids.to(args.device), \
+               padded_joint_type_ids.to(args.device), \
+               padded_joint_attn_mask.to(args.device)
 
     # initializes dataloader
     train_sampler = RandomSampler(train_dataset)

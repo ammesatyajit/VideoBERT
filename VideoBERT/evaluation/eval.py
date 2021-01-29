@@ -135,6 +135,8 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         tr_vid_loss += outputs[4]
         tr_joint_loss += outputs[6]
 
+        outputs = None
+
     return tr_loss / global_step, tr_text_loss / global_step, tr_vid_loss / global_step, tr_joint_loss / global_step
 
 

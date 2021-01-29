@@ -116,6 +116,7 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         if text_ids.shape[1] >= 300:
             continue
 
+        print(text_ids, video_ids, joint_ids)
         outputs = model(
             text_input_ids=text_ids,
             text_token_type_ids=text_type_ids,
@@ -134,8 +135,6 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         tr_text_loss += outputs[2]
         tr_vid_loss += outputs[4]
         tr_joint_loss += outputs[6]
-
-        outputs = None
 
     return tr_loss / global_step, tr_text_loss / global_step, tr_vid_loss / global_step, tr_joint_loss / global_step
 

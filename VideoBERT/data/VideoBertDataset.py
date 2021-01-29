@@ -21,15 +21,15 @@ class VideoBertDataset(Dataset):
 
     def setup_data(self):
         self.tokenizer.sep_token = '<sep>'
-        examples = [[self.tokenizer.sep_token]]
+        examples = []
         for _, values in self.data.items():
             examples.extend(values)
         self.data = examples
 
     def setup_tokenizer(self):
-        vocab_data = []
+        vocab_data = [self.tokenizer.sep_token]
         for example in self.data:
-            vocab_data.append(self.tokenizer.tokenize(example['text']))
+            vocab_data.append(self.tokenizer.tokenize(example['sentence']))
         self.tokenizer.build_vocab(vocab_data)
 
     def create_text_example(self, i):

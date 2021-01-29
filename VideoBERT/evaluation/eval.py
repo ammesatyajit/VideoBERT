@@ -43,7 +43,7 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
 
     # Calculates the batch size for training given number of gpus and batch size for gpus
 
-    pad_id = eval_dataset.tokenizer.stoi[eval_dataset.tokenizer.pad_token]
+    pad_id = eval_dataset.tokenizer.vocab.stoi[eval_dataset.tokenizer.pad_token]
 
     def collate(examples):
         text_examples = [None] * len(examples)

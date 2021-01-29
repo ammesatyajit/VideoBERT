@@ -7,7 +7,7 @@ bert_model = 'bert-large-uncased'
 tokenizer = BertTokenizer.from_pretrained(bert_model)
 
 bert_vocab_size = len(tokenizer)
-visual_vocab_size = 20544
+visual_vocab_size = 20736
 visual_linguistic_glue = 1
 
 total_vocab_size = bert_vocab_size + \

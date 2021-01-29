@@ -471,6 +471,11 @@ def main(colab_args=None):
                           lower=True,
                           batch_first=True)
 
+    train_dataset = VideoBertDataset(tokenizer, build_tokenizer=new_tokenizer, data_path=args.train_data_path)
+    eval_dataset = VideoBertDataset(train_dataset.tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
+
+    data_globals.config.vocab_size = len(train_dataset.tokenizer.vocab.itos) + 20736
+
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
@@ -486,8 +491,6 @@ def main(colab_args=None):
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
-    train_dataset = VideoBertDataset(tokenizer, build_tokenizer=new_tokenizer, data_path=args.train_data_path)
-    eval_dataset = VideoBertDataset(train_dataset.tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
 
     if new_tokenizer:
         torch.save(train_dataset.tokenizer, os.path.join(args.output_dir, "tokenizer.pt"))

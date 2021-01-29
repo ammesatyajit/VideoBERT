@@ -28,7 +28,7 @@ class VideoBertDataset(Dataset):
         self.data = examples
 
     def setup_tokenizer(self):
-        vocab_data = [str(self.tokenizer.sep_token, self.tokenizer.sep_token)]
+        vocab_data = [self.tokenizer.sep_token + ' ' + self.tokenizer.sep_token]
         print('setting up tokenizer')
         for example in tqdm(self.data):
             vocab_data.append(self.tokenizer.tokenize(example['sentence']))

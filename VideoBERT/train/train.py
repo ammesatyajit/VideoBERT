@@ -435,7 +435,6 @@ def main(colab_args=None):
     if (
             os.path.exists(args.output_dir)
             and os.listdir(args.output_dir)
-            and args.do_train
             and not args.overwrite_output_dir
             and not args.should_continue
     ):

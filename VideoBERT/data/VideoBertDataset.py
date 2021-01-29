@@ -33,7 +33,7 @@ class VideoBertDataset(Dataset):
         self.tokenizer.build_vocab(vocab_data)
 
     def create_text_example(self, i):
-        sentence = self.data[i]['text']
+        sentence = self.data[i]['sentence']
         sentence = [self.tokenizer.vocab.stoi[token] for token in self.tokenizer.tokenize(sentence)]
         sentence.insert(0, self.tokenizer.vocab.stoi[self.tokenizer.init_token])
         sentence.append(self.tokenizer.vocab.stoi[self.tokenizer.eos_token])
@@ -45,7 +45,7 @@ class VideoBertDataset(Dataset):
         return text_ids, text_tok_type_ids, text_attn_mask
 
     def create_video_example(self, i):
-        vid_ids = self.data[i]['vid_ids']
+        vid_ids = self.data[i]['vid_tokens']
         vid_ids = [vid_id + len(self.tokenizer.vocab) for vid_id in vid_ids]
         vid_ids.insert(0, self.tokenizer.vocab.stoi[self.tokenizer.init_token])
         vid_ids.append(self.tokenizer.vocab.stoi[self.tokenizer.eos_token])

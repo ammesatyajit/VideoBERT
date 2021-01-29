@@ -77,15 +77,15 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         padded_joint_type_ids = pad_sequence(joint_type_ids, batch_first=True, padding_value=1)
         padded_joint_attn_mask = padded_joint_ids == pad_id
 
-        return padded_text_ids, \
-               padded_text_type_ids, \
-               padded_text_attn_mask, \
-               padded_video_ids, \
-               padded_video_type_ids, \
-               padded_video_attn_mask, \
-               padded_joint_ids, \
-               padded_joint_type_ids, \
-               padded_joint_attn_mask
+        return padded_text_ids.to(args.device), \
+               padded_text_type_ids.to(args.device), \
+               padded_text_attn_mask.to(args.device), \
+               padded_video_ids.to(args.device), \
+               padded_video_type_ids.to(args.device), \
+               padded_video_attn_mask.to(args.device), \
+               padded_joint_ids.to(args.device), \
+               padded_joint_type_ids.to(args.device), \
+               padded_joint_attn_mask.to(args.device)
 
     # initializes dataloader
     eval_sampler = RandomSampler(eval_dataset)
@@ -101,15 +101,15 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
     eval_iterator = tqdm(eval_dataloader, desc="Iteration")
 
     for step, \
-        [text_ids, \
-        text_type_ids, \
-        text_attn_mask, \
-        video_ids, \
-        video_type_ids, \
-        video_attn_mask, \
-        joint_ids, \
-        joint_type_ids, \
-        joint_attn_mask] in enumerate(eval_iterator):
+        [text_ids,
+         text_type_ids,
+         text_attn_mask,
+         video_ids,
+         video_type_ids,
+         video_attn_mask,
+         joint_ids,
+         joint_type_ids,
+         joint_attn_mask] in enumerate(eval_iterator):
 
         torch.cuda.empty_cache()
 

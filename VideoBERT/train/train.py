@@ -257,12 +257,13 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 joint_attention_mask=joint_attn_mask
             )
 
-            print("After model:")
-            print(torch.cuda.memory_summary(args.device, abbreviated=True))
             total_loss = outputs[0]
             text_loss = float(outputs[2])
             video_loss = float(outputs[4])
             joint_loss = float(outputs[6])
+            del outputs
+            print("After model:")
+            print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
             if args.n_gpu > 1:
                 total_loss = total_loss.mean()  # mean() to average on multi-gpu parallel training
@@ -273,7 +274,6 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 # joint_loss = joint_loss / args.gradient_accumulation_steps
 
             total_loss.backward()
-            del outputs
             print("After backward:")
             print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
@@ -290,7 +290,6 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
 
                 optimizer.step()
                 scheduler.step()  # Update learning rate schedule
-                model.zero_grad()
                 global_step += 1
 
                 if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:

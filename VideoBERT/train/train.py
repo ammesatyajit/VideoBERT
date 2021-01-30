@@ -234,7 +234,7 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 steps_trained_in_current_epoch -= 1
                 continue
 
-            if text_ids.shape[1] >= 300:
+            if text_ids.shape[1] >= 100:
                 continue
 
             outputs = model(
@@ -498,12 +498,12 @@ def main(colab_args=None):
         logger.info("Saving tokenizer to %s", args.output_dir)
 
     # Benchmark Evaluation
-    # total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
-    # print("Benchmark Eval:\n"
-    #       "Total: {}\n"
-    #       "Text: {}\n"
-    #       "Video: {}\n"
-    #       "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
+    total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
+    print("Benchmark Eval:\n"
+          "Total: {}\n"
+          "Text: {}\n"
+          "Video: {}\n"
+          "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
 
     # Start Training
     model.train()

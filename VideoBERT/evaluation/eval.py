@@ -116,26 +116,25 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         if text_ids.shape[1] >= 100 or video_ids.shape[1] >= 100 or joint_ids.shape[1] >= 100:
             continue
 
-        print(joint_ids)
+        with torch.no_grad():
+            outputs = model(
+                text_input_ids=text_ids,
+                text_token_type_ids=text_type_ids,
+                text_attention_mask=text_attn_mask,
 
-        outputs = model(
-            text_input_ids=text_ids,
-            text_token_type_ids=text_type_ids,
-            text_attention_mask=text_attn_mask,
+                video_input_ids=video_ids,
+                video_token_type_ids=video_type_ids,
+                video_attention_mask=video_attn_mask,
 
-            video_input_ids=video_ids,
-            video_token_type_ids=video_type_ids,
-            video_attention_mask=video_attn_mask,
+                joint_input_ids=joint_ids,
+                joint_token_type_ids=joint_type_ids,
+                joint_attention_mask=joint_attn_mask
+            )
 
-            joint_input_ids=joint_ids,
-            joint_token_type_ids=joint_type_ids,
-            joint_attention_mask=joint_attn_mask
-        )
-
-        tr_loss += outputs[0]
-        tr_text_loss += outputs[2]
-        tr_vid_loss += outputs[4]
-        tr_joint_loss += outputs[6]
+            tr_loss += outputs[0]
+            tr_text_loss += outputs[2]
+            tr_vid_loss += outputs[4]
+            tr_joint_loss += outputs[6]
 
     return tr_loss / global_step, tr_text_loss / global_step, tr_vid_loss / global_step, tr_joint_loss / global_step
 

@@ -271,6 +271,7 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 # joint_loss = joint_loss / args.gradient_accumulation_steps
 
             total_loss.backward()
+            del outputs
             print("After backward:")
             print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
@@ -282,6 +283,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                       'text loss:', text_loss,
                       'video loss:', video_loss,
                       'joint loss:', joint_loss)
+
+                del total_loss
 
                 optimizer.step()
                 scheduler.step()  # Update learning rate schedule

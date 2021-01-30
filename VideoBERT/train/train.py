@@ -252,9 +252,9 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
             )
 
             total_loss = outputs[0]
-            text_loss = outputs[2]
-            video_loss = outputs[4]
-            joint_loss = outputs[6]
+            text_loss = float(outputs[2])
+            video_loss = float(outputs[4])
+            joint_loss = float(outputs[6])
 
             if args.n_gpu > 1:
                 total_loss = total_loss.mean()  # mean() to average on multi-gpu parallel training
@@ -266,14 +266,14 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
 
             total_loss.backward()
 
-            tr_loss += total_loss.item()
+            tr_loss += float(total_loss.item())
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
 
-                print('loss:', total_loss.item(),
-                      'text loss:', text_loss.item(),
-                      'video loss:', video_loss.item(),
-                      'joint loss:', joint_loss.item())
+                print('loss:', float(total_loss),
+                      'text loss:', text_loss,
+                      'video loss:', video_loss,
+                      'joint loss:', joint_loss)
 
                 optimizer.step()
                 scheduler.step()  # Update learning rate schedule

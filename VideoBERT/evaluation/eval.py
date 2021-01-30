@@ -131,10 +131,10 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
                 joint_attention_mask=joint_attn_mask
             )
 
-            tr_loss += outputs[0]
-            tr_text_loss += outputs[2]
-            tr_vid_loss += outputs[4]
-            tr_joint_loss += outputs[6]
+            tr_loss += float(outputs[0])
+            tr_text_loss += float(outputs[2])
+            tr_vid_loss += float(outputs[4])
+            tr_joint_loss += float(outputs[6])
 
     return tr_loss / global_step, tr_text_loss / global_step, tr_vid_loss / global_step, tr_joint_loss / global_step
 

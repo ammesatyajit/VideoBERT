@@ -77,15 +77,15 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
         padded_joint_type_ids = pad_sequence(joint_type_ids, batch_first=True, padding_value=1)
         padded_joint_attn_mask = padded_joint_ids == pad_id
 
-        return padded_text_ids.to(args.device), \
-               padded_text_type_ids.to(args.device), \
-               padded_text_attn_mask.to(args.device), \
-               padded_video_ids.to(args.device), \
-               padded_video_type_ids.to(args.device), \
-               padded_video_attn_mask.to(args.device), \
-               padded_joint_ids.to(args.device), \
-               padded_joint_type_ids.to(args.device), \
-               padded_joint_attn_mask.to(args.device)
+        return padded_text_ids, \
+               padded_text_type_ids, \
+               padded_text_attn_mask, \
+               padded_video_ids, \
+               padded_video_type_ids, \
+               padded_video_attn_mask, \
+               padded_joint_ids, \
+               padded_joint_type_ids, \
+               padded_joint_attn_mask
 
     # initializes dataloader
     eval_sampler = RandomSampler(eval_dataset)
@@ -113,8 +113,10 @@ def evaluate(args, model, eval_dataset: VideoBertDataset):
 
         torch.cuda.empty_cache()
 
-        if text_ids.shape[1] >= 300:
+        if text_ids.shape[1] >= 100 or video_ids.shape[1] >= 100 or joint_ids.shape[1] >= 100:
             continue
+
+        print(joint_ids)
 
         outputs = model(
             text_input_ids=text_ids,

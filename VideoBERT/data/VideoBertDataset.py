@@ -32,7 +32,7 @@ class VideoBertDataset(Dataset):
         print('setting up tokenizer')
         for example in tqdm(self.data):
             vocab_data.append(self.tokenizer.tokenize(example['sentence']))
-        self.tokenizer.build_vocab(vocab_data, min_freq = 2)
+        self.tokenizer.build_vocab(vocab_data, min_freq=2)
         print('tokenizer set up successfully')
 
     def create_text_example(self, i):
@@ -117,7 +117,7 @@ class VideoBertDatasetOld(Dataset):
                 # no concat
 
                 # choose between temp aligned or not
-                r = random.uniform(0,1)
+                r = random.uniform(0, 1)
                 if r > 0.5:
                     text_index = i
                     video_index = i
@@ -131,7 +131,7 @@ class VideoBertDatasetOld(Dataset):
                 # do concat
 
                 # choose between temp aligned or not
-                r = random.uniform(0,1)
+                r = random.uniform(0, 1)
 
                 if r > 0.5:
                     # temp aligned
@@ -140,21 +140,21 @@ class VideoBertDatasetOld(Dataset):
 
                     if i == end_boundary_index:
                         concat_index = i
-                        start_index = i-1
+                        start_index = i - 1
                     else:
-                        r = random.uniform(0,1)
+                        r = random.uniform(0, 1)
                         if r > 0.5:
                             start_index = i
-                            concat_index = i+1
+                            concat_index = i + 1
                         else:
-                            start_index = i-1
+                            start_index = i - 1
                             concat_index = i
 
                     text_index = [start_index, concat_index]
                     video_index = [start_index, concat_index]
-                    label = 0 # temp aligned
+                    label = 0  # temp aligned
                 else:
-                    indices = [k for k in range(start_boundary_index, end_boundary_index + 1) if k != i and k != i+1]
+                    indices = [k for k in range(start_boundary_index, end_boundary_index + 1) if k != i and k != i + 1]
                     try:
                         concat_index = random.choice(indices)
                     except:
@@ -162,7 +162,7 @@ class VideoBertDatasetOld(Dataset):
                         print('bad')
                     text_index = [i, concat_index]
                     video_index = [i, concat_index]
-                    label = 1 # not temp aligned
+                    label = 1  # not temp aligned
 
         text_sentence = None
         video_sentence = None
@@ -220,26 +220,27 @@ class VideoBertDatasetOld(Dataset):
                 i -= 1
 
         if not edge_case:
-            r = random.uniform(0,1)
+            r = random.uniform(0, 1)
             if r > 0.5:
                 text_index = i
                 video_index = i
-                label = 0 # temporarily aligned
+                label = 0  # temporarily aligned
             else:
                 text_index = i
                 indices = [k for k in range(start_boundary_index, end_boundary_index + 1) if k != i]
                 video_index = random.choice(indices)
-                label = 1 # not temporarily aligned
+                label = 1  # not temporarily aligned
 
         text_sentence = self.data[text_index][0]
         video_sentence = self.data[video_index][1]
 
         if max_token_len > 0:
             if (len(text_sentence) + len(video_sentence)) > max_token_len:
-               num_tokens_to_remove = (len(text_sentence) + len(video_sentence)) - max_token_len
-               first, second, _ = self.tokenizer.truncate_sequences(ids=text_sentence, pair_ids=video_sentence, num_tokens_to_remove=num_tokens_to_remove)
-               text_sentence = first
-               video_sentence = second
+                num_tokens_to_remove = (len(text_sentence) + len(video_sentence)) - max_token_len
+                first, second, _ = self.tokenizer.truncate_sequences(ids=text_sentence, pair_ids=video_sentence,
+                                                                     num_tokens_to_remove=num_tokens_to_remove)
+                text_sentence = first
+                video_sentence = second
 
         text_token_type_ids = np.zeros(len(text_sentence) + 2)
         video_token_type_ids = np.ones(len(video_sentence) + 1)
@@ -274,7 +275,7 @@ class VideoBertDatasetOld(Dataset):
         if i == end_boundary_index and i == start_boundary_index:
             first_sentence = self.data[i][mode_index]
             second_sentence = self.data[i][mode_index]
-            label = 1 # not natural next sentence
+            label = 1  # not natural next sentence
         else:
             if i == end_boundary_index:
                 i -= 1
@@ -285,11 +286,11 @@ class VideoBertDatasetOld(Dataset):
 
             if r > 0.5:
                 # take natural next sentence
-                next_index = i+1
+                next_index = i + 1
                 label = 0
             else:
                 # take random sentence
-                indices = [k for k in range(start_boundary_index, end_boundary_index+1) if k != i+1]
+                indices = [k for k in range(start_boundary_index, end_boundary_index + 1) if k != i + 1]
                 next_index = random.choice(indices)
                 label = 1
 
@@ -297,11 +298,12 @@ class VideoBertDatasetOld(Dataset):
 
         if max_token_len > 0:
             if (len(first_sentence) + len(second_sentence)) > max_token_len:
-               #print('truncating SINGLE...')
-               num_tokens_to_remove = (len(first_sentence) + len(second_sentence)) - max_token_len
-               first, second, _ = self.tokenizer.truncate_sequences(ids=first_sentence, pair_ids=second_sentence, num_tokens_to_remove=num_tokens_to_remove)
-               first_sentence = first
-               second_sentence = second
+                # print('truncating SINGLE...')
+                num_tokens_to_remove = (len(first_sentence) + len(second_sentence)) - max_token_len
+                first, second, _ = self.tokenizer.truncate_sequences(ids=first_sentence, pair_ids=second_sentence,
+                                                                     num_tokens_to_remove=num_tokens_to_remove)
+                first_sentence = first
+                second_sentence = second
 
         first_token_type_ids = np.zeros(len(first_sentence) + 2)
         second_token_type_ids = np.ones(len(second_sentence) + 1)
@@ -335,4 +337,3 @@ class VideoBertDatasetOld(Dataset):
         joint_sentence, joint_label, joint_token_type_ids = self.create_concat_joint_sentence(i, max_token_len=-1)
 
         return text_sentence, text_label, text_token_type_ids, video_sentence, video_label, video_token_type_ids, joint_sentence, joint_label, joint_token_type_ids
-

@@ -475,6 +475,7 @@ def main(colab_args=None):
     eval_dataset = VideoBertDataset(train_dataset.tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
 
     data_globals.config.vocab_size = len(train_dataset.tokenizer.vocab.itos) + 20736
+    print("total vocab size of", len(train_dataset.tokenizer.vocab.itos) + 20736)
 
     if args.model_name_or_path is None:
         # start from inital model

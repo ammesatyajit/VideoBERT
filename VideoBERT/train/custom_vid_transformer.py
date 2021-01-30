@@ -52,10 +52,10 @@ class VideoTransformer(nn.Module):
         if text_input_ids is not None:
             text_mask = self._generate_square_subsequent_mask(text_input_ids.shape[1]-1).to(self.args.device)
             text_out = self.get_outputs(
-                seq=text_input_ids[:, :-1],
-                tok_type_ids=text_token_type_ids[:, :-1],
+                seq=text_input_ids[:, :-1].to(self.args.device),
+                tok_type_ids=text_token_type_ids[:, :-1].to(self.args.device),
                 attn_mask=text_mask,
-                key_pad_mask=text_attention_mask[:, :-1],
+                key_pad_mask=text_attention_mask[:, :-1].to(self.args.device),
             )
 
             outputs.append(text_out)
@@ -69,10 +69,10 @@ class VideoTransformer(nn.Module):
         if video_input_ids is not None:
             vid_mask = self._generate_square_subsequent_mask(video_input_ids.shape[1]-1).to(self.args.device)
             vid_out = self.get_outputs(
-                seq=video_input_ids[:, :-1],
-                tok_type_ids=video_token_type_ids[:, :-1],
+                seq=video_input_ids[:, :-1].to(self.args.device),
+                tok_type_ids=video_token_type_ids[:, :-1].to(self.args.device),
                 attn_mask=vid_mask,
-                key_pad_mask=video_attention_mask[:, :-1],
+                key_pad_mask=video_attention_mask[:, :-1].to(self.args.device),
             )
 
             outputs.append(vid_out)
@@ -86,10 +86,10 @@ class VideoTransformer(nn.Module):
         if joint_input_ids is not None:
             joint_mask = self._generate_square_subsequent_mask(joint_input_ids.shape[1]-1).to(self.args.device)
             joint_out = self.get_outputs(
-                seq=joint_input_ids[:, :-1],
-                tok_type_ids=joint_token_type_ids[:, :-1],
+                seq=joint_input_ids[:, :-1].to(self.args.device),
+                tok_type_ids=joint_token_type_ids[:, :-1].to(self.args.device),
                 attn_mask=joint_mask,
-                key_pad_mask=joint_attention_mask[:, :-1],
+                key_pad_mask=joint_attention_mask[:, :-1].to(self.args.device),
             )
 
             outputs.append(joint_out)

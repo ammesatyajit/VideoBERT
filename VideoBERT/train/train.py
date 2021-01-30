@@ -231,8 +231,7 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
              joint_attn_mask] in enumerate(epoch_iterator):
 
             torch.cuda.empty_cache()
-            print("After empty Cache:")
-            print(torch.cuda.memory_summary(args.device, abbreviated=True))
+
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -242,7 +241,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 continue
 
             model.zero_grad()
-
+            print("before model:")
+            print(torch.cuda.memory_summary(args.device, abbreviated=True))
             outputs = model(
                 text_input_ids=text_ids,
                 text_token_type_ids=text_type_ids,
@@ -257,6 +257,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 joint_attention_mask=joint_attn_mask
             )
 
+            print("After model:")
+            print(torch.cuda.memory_summary(args.device, abbreviated=True))
             total_loss = outputs[0]
             text_loss = float(outputs[2])
             video_loss = float(outputs[4])

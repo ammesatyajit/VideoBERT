@@ -214,8 +214,6 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
     )
     set_seed(args)  # Added here for reproducibility
     model.train()
-    print("Right before training loop:")
-    print(torch.cuda.memory_summary(args.device, abbreviated=True))
     for epoch in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
 
@@ -241,8 +239,6 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 continue
 
             model.zero_grad()
-            print("before model:")
-            print(torch.cuda.memory_summary(args.device, abbreviated=True))
             outputs = model(
                 text_input_ids=text_ids,
                 text_token_type_ids=text_type_ids,
@@ -262,8 +258,6 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
             video_loss = float(outputs[4])
             joint_loss = float(outputs[6])
             del outputs
-            print("After model:")
-            print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
             if args.n_gpu > 1:
                 total_loss = total_loss.mean()  # mean() to average on multi-gpu parallel training
@@ -274,8 +268,6 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 # joint_loss = joint_loss / args.gradient_accumulation_steps
 
             total_loss.backward()
-            print("After backward:")
-            print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
             tr_loss += float(total_loss.item())
             if (step + 1) % args.gradient_accumulation_steps == 0:
@@ -489,9 +481,6 @@ def main(colab_args=None):
     data_globals.config.vocab_size = len(train_dataset.tokenizer.vocab.itos) + 20736
     print("total vocab size of", len(train_dataset.tokenizer.vocab.itos) + 20736)
 
-    print("Before model init:")
-    print(torch.cuda.memory_summary(args.device, abbreviated=True))
-
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
@@ -503,9 +492,6 @@ def main(colab_args=None):
         model = VideoTransformer.from_pretrained(config=data_globals.config, args=args)
 
     model.to(args.device)
-
-    print("After model init:")
-    print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
     logger.info("Training/evaluation parameters %s", args)
 

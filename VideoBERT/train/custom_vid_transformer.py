@@ -63,7 +63,7 @@ class VideoTransformer(nn.Module):
             loss_fct = torch.nn.CrossEntropyLoss()
             text_out = text_out.permute(2, 0, 1)
             text_out = text_out.view(self.config.vocab_size, -1).permute(1, 0)
-            text_loss = loss_fct(text_out, text_input_ids[:, 1:].contiguous().view(-1))
+            text_loss = loss_fct(text_out, text_input_ids[:, 1:].contiguous().view(-1).to(self.args.device))
             outputs.append(text_loss)
 
         if video_input_ids is not None:
@@ -80,7 +80,7 @@ class VideoTransformer(nn.Module):
             loss_fct = torch.nn.CrossEntropyLoss()
             vid_out = vid_out.permute(2, 0, 1)
             vid_out = vid_out.view(self.config.vocab_size, -1).permute(1, 0)
-            video_loss = loss_fct(vid_out, video_input_ids[:, 1:].contiguous().view(-1))
+            video_loss = loss_fct(vid_out, video_input_ids[:, 1:].contiguous().view(-1).to(self.args.device))
             outputs.append(video_loss)
 
         if joint_input_ids is not None:
@@ -97,7 +97,7 @@ class VideoTransformer(nn.Module):
             loss_fct = torch.nn.CrossEntropyLoss()
             joint_out = joint_out.permute(2, 0, 1)
             joint_out = joint_out.view(self.config.vocab_size, -1).permute(1, 0)
-            joint_loss = loss_fct(joint_out, joint_input_ids[:, 1:].contiguous().view(-1))
+            joint_loss = loss_fct(joint_out, joint_input_ids[:, 1:].contiguous().view(-1).to(self.args.device))
             outputs.append(joint_loss)
 
         if text_loss is not None and video_loss is not None and joint_loss is not None:

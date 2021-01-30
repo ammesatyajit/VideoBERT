@@ -92,7 +92,7 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
     # Calculates the batch size for training given number of gpus and batch size for gpus
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
 
-    pad_id = train_dataset.tokenizer.stoi[train_dataset.tokenizer.pad_token]
+    pad_id = train_dataset.tokenizer.vocab.stoi[train_dataset.tokenizer.pad_token]
 
     def collate(examples):
         text_examples = [None] * len(examples)
@@ -126,15 +126,15 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
         padded_joint_type_ids = pad_sequence(joint_type_ids, batch_first=True, padding_value=1)
         padded_joint_attn_mask = padded_joint_ids == pad_id
 
-        return padded_text_ids.to(args.device), \
-               padded_text_type_ids.to(args.device), \
-               padded_text_attn_mask.to(args.device), \
-               padded_video_ids.to(args.device), \
-               padded_video_type_ids.to(args.device), \
-               padded_video_attn_mask.to(args.device), \
-               padded_joint_ids.to(args.device), \
-               padded_joint_type_ids.to(args.device), \
-               padded_joint_attn_mask.to(args.device)
+        return padded_text_ids, \
+               padded_text_type_ids, \
+               padded_text_attn_mask, \
+               padded_video_ids, \
+               padded_video_type_ids, \
+               padded_video_attn_mask, \
+               padded_joint_ids, \
+               padded_joint_type_ids, \
+               padded_joint_attn_mask
 
     # initializes dataloader
     train_sampler = RandomSampler(train_dataset)
@@ -218,15 +218,15 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
 
         for step, \
-            text_ids, \
-            text_type_ids, \
-            text_attn_mask, \
-            video_ids, \
-            video_type_ids, \
-            video_attn_mask, \
-            joint_ids, \
-            joint_type_ids, \
-            joint_attn_mask in enumerate(epoch_iterator):
+            [text_ids,
+             text_type_ids,
+             text_attn_mask,
+             video_ids,
+             video_type_ids,
+             video_attn_mask,
+             joint_ids,
+             joint_type_ids,
+             joint_attn_mask] in enumerate(epoch_iterator):
 
             torch.cuda.empty_cache()
             # Skip past any already trained steps if resuming training

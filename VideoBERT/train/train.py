@@ -214,6 +214,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
     )
     set_seed(args)  # Added here for reproducibility
     model.train()
+    print("Right before training loop:")
+    print(torch.cuda.memory_summary(args.device))
     for epoch in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
 
@@ -479,6 +481,9 @@ def main(colab_args=None):
     data_globals.config.vocab_size = len(train_dataset.tokenizer.vocab.itos) + 20736
     print("total vocab size of", len(train_dataset.tokenizer.vocab.itos) + 20736)
 
+    print("Before model init:")
+    print(torch.cuda.memory_summary(args.device))
+
     if args.model_name_or_path is None:
         # start from inital model
         print('### LOADING INITIAL MODEL ###')
@@ -491,6 +496,9 @@ def main(colab_args=None):
 
     model.to(args.device)
 
+    print("After model init:")
+    print(torch.cuda.memory_summary(args.device))
+
     logger.info("Training/evaluation parameters %s", args)
 
     # Training
@@ -501,11 +509,14 @@ def main(colab_args=None):
 
     # Benchmark Evaluation
     total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
-    # print("Benchmark Eval:\n"
-    #       "Total: {}\n"
-    #       "Text: {}\n"
-    #       "Video: {}\n"
-    #       "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
+    print("Benchmark Eval:\n"
+          "Total: {}\n"
+          "Text: {}\n"
+          "Video: {}\n"
+          "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
+
+    print("After Eval:")
+    print(torch.cuda.memory_summary(args.device))
 
     # Start Training
     model.train()

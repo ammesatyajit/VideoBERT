@@ -215,7 +215,7 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
     set_seed(args)  # Added here for reproducibility
     model.train()
     print("Right before training loop:")
-    print(torch.cuda.memory_summary(args.device))
+    print(torch.cuda.memory_summary(args.device, abbreviated=True))
     for epoch in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
 
@@ -231,6 +231,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
              joint_attn_mask] in enumerate(epoch_iterator):
 
             torch.cuda.empty_cache()
+            print("After empty Cache:")
+            print(torch.cuda.memory_summary(args.device, abbreviated=True))
             # Skip past any already trained steps if resuming training
             if steps_trained_in_current_epoch > 0:
                 steps_trained_in_current_epoch -= 1
@@ -269,6 +271,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
                 # joint_loss = joint_loss / args.gradient_accumulation_steps
 
             total_loss.backward()
+            print("After backward:")
+            print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
             tr_loss += float(total_loss.item())
             if (step + 1) % args.gradient_accumulation_steps == 0:
@@ -482,7 +486,7 @@ def main(colab_args=None):
     print("total vocab size of", len(train_dataset.tokenizer.vocab.itos) + 20736)
 
     print("Before model init:")
-    print(torch.cuda.memory_summary(args.device))
+    print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
     if args.model_name_or_path is None:
         # start from inital model
@@ -497,7 +501,7 @@ def main(colab_args=None):
     model.to(args.device)
 
     print("After model init:")
-    print(torch.cuda.memory_summary(args.device))
+    print(torch.cuda.memory_summary(args.device, abbreviated=True))
 
     logger.info("Training/evaluation parameters %s", args)
 
@@ -508,15 +512,15 @@ def main(colab_args=None):
         logger.info("Saving tokenizer to %s", args.output_dir)
 
     # Benchmark Evaluation
-    total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
-    print("Benchmark Eval:\n"
-          "Total: {}\n"
-          "Text: {}\n"
-          "Video: {}\n"
-          "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
-
-    print("After Eval:")
-    print(torch.cuda.memory_summary(args.device))
+    # total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
+    # print("Benchmark Eval:\n"
+    #       "Total: {}\n"
+    #       "Text: {}\n"
+    #       "Video: {}\n"
+    #       "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
+    #
+    # print("After Eval:")
+    # print(torch.cuda.memory_summary(args.device))
 
     # Start Training
     model.train()

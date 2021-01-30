@@ -227,98 +227,111 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
              joint_ids,
              joint_type_ids,
              joint_attn_mask] in enumerate(epoch_iterator):
+            try:
+                torch.cuda.empty_cache()
 
-            torch.cuda.empty_cache()
+                # Skip past any already trained steps if resuming training
+                if steps_trained_in_current_epoch > 0:
+                    steps_trained_in_current_epoch -= 1
+                    continue
 
-            # Skip past any already trained steps if resuming training
-            if steps_trained_in_current_epoch > 0:
-                steps_trained_in_current_epoch -= 1
-                continue
+                if text_ids.shape[1] >= 100:
+                    continue
 
-            if text_ids.shape[1] >= 100:
-                continue
+                model.zero_grad()
+                outputs = model(
+                    text_input_ids=text_ids,
+                    text_token_type_ids=text_type_ids,
+                    text_attention_mask=text_attn_mask,
 
-            model.zero_grad()
-            outputs = model(
-                text_input_ids=text_ids,
-                text_token_type_ids=text_type_ids,
-                text_attention_mask=text_attn_mask,
+                    video_input_ids=video_ids,
+                    video_token_type_ids=video_type_ids,
+                    video_attention_mask=video_attn_mask,
 
-                video_input_ids=video_ids,
-                video_token_type_ids=video_type_ids,
-                video_attention_mask=video_attn_mask,
+                    joint_input_ids=joint_ids,
+                    joint_token_type_ids=joint_type_ids,
+                    joint_attention_mask=joint_attn_mask
+                )
 
-                joint_input_ids=joint_ids,
-                joint_token_type_ids=joint_type_ids,
-                joint_attention_mask=joint_attn_mask
-            )
+                total_loss = outputs[0]
+                text_loss = float(outputs[2])
+                video_loss = float(outputs[4])
+                joint_loss = float(outputs[6])
+                del outputs
 
-            total_loss = outputs[0]
-            text_loss = float(outputs[2])
-            video_loss = float(outputs[4])
-            joint_loss = float(outputs[6])
-            del outputs
+                if args.n_gpu > 1:
+                    total_loss = total_loss.mean()  # mean() to average on multi-gpu parallel training
+                if args.gradient_accumulation_steps > 1:
+                    total_loss = total_loss / args.gradient_accumulation_steps
+                    # text_loss = text_loss / args.gradient_accumulation_steps
+                    # video_loss = video_loss / args.gradient_accumulation_steps
+                    # joint_loss = joint_loss / args.gradient_accumulation_steps
 
-            if args.n_gpu > 1:
-                total_loss = total_loss.mean()  # mean() to average on multi-gpu parallel training
-            if args.gradient_accumulation_steps > 1:
-                total_loss = total_loss / args.gradient_accumulation_steps
-                # text_loss = text_loss / args.gradient_accumulation_steps
-                # video_loss = video_loss / args.gradient_accumulation_steps
-                # joint_loss = joint_loss / args.gradient_accumulation_steps
+                total_loss.backward()
 
-            total_loss.backward()
+                tr_loss += float(total_loss.item())
+                if (step + 1) % args.gradient_accumulation_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
 
-            tr_loss += float(total_loss.item())
-            if (step + 1) % args.gradient_accumulation_steps == 0:
-                torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
+                    print('loss:', float(total_loss),
+                          'text loss:', text_loss,
+                          'video loss:', video_loss,
+                          'joint loss:', joint_loss)
 
-                print('loss:', float(total_loss),
-                      'text loss:', text_loss,
-                      'video loss:', video_loss,
-                      'joint loss:', joint_loss)
+                    del total_loss
 
-                del total_loss
+                    optimizer.step()
+                    scheduler.step()  # Update learning rate schedule
+                    global_step += 1
 
-                optimizer.step()
-                scheduler.step()  # Update learning rate schedule
-                global_step += 1
+                    if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
+                        print('writing tf logs...')
+                        tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
+                        tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
+                        logging_loss = tr_loss
 
-                if args.local_rank in [-1, 0] and args.logging_steps > 0 and global_step % args.logging_steps == 0:
-                    print('writing tf logs...')
-                    tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
-                    tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
-                    logging_loss = tr_loss
+                    if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
+                        total_eval_loss, text_eval_loss, video_eval_loss, joint_eval_loss = evaluate(args, model, eval_dataset)
+                        print("Benchmark Eval:\n"
+                              "Total: {}\n"
+                              "Text: {}\n"
+                              "Video: {}\n"
+                              "Joint: {}\n".format(total_eval_loss, text_eval_loss, video_eval_loss, joint_eval_loss))
+                        model.train()
+                        checkpoint_prefix = "checkpoint"
+                        # Save model checkpoint
+                        output_dir = os.path.join(args.output_dir, "{}-{}".format(checkpoint_prefix, global_step))
+                        os.makedirs(output_dir, exist_ok=True)
+                        model_to_save = (
+                            model.module if hasattr(model, "module") else model
+                        )  # Take care of distributed/parallel training
+                        model_to_save.save_pretrained(output_dir)
 
-                if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
-                    total_eval_loss, text_eval_loss, video_eval_loss, joint_eval_loss = evaluate(args, model, eval_dataset)
-                    print("Benchmark Eval:\n"
-                          "Total: {}\n"
-                          "Text: {}\n"
-                          "Video: {}\n"
-                          "Joint: {}\n".format(total_eval_loss, text_eval_loss, video_eval_loss, joint_eval_loss))
-                    model.train()
-                    checkpoint_prefix = "checkpoint"
-                    # Save model checkpoint
-                    output_dir = os.path.join(args.output_dir, "{}-{}".format(checkpoint_prefix, global_step))
-                    os.makedirs(output_dir, exist_ok=True)
-                    model_to_save = (
-                        model.module if hasattr(model, "module") else model
-                    )  # Take care of distributed/parallel training
-                    model_to_save.save_pretrained(output_dir)
+                        torch.save(args, os.path.join(output_dir, "training_args.bin"))
+                        logger.info("Saving model checkpoint to %s", output_dir)
 
-                    torch.save(args, os.path.join(output_dir, "training_args.bin"))
-                    logger.info("Saving model checkpoint to %s", output_dir)
+                        _rotate_checkpoints(args, checkpoint_prefix)
 
-                    _rotate_checkpoints(args, checkpoint_prefix)
+                        torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
+                        torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                        logger.info("Saving optimizer and scheduler states to %s", output_dir)
 
-                    torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
-                    torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
-                    logger.info("Saving optimizer and scheduler states to %s", output_dir)
+                if 0 < args.max_steps < global_step:
+                    epoch_iterator.close()
+                    break
+            except Exception as e:
+                print(e)
+                print("continuing to next batch")
+                try:
+                    del outputs
+                except:
+                    print('')
 
-            if 0 < args.max_steps < global_step:
-                epoch_iterator.close()
-                break
+                try:
+                    del total_loss
+                except:
+                    print('')
+
         if 0 < args.max_steps < global_step:
             train_iterator.close()
             break

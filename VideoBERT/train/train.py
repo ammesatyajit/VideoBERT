@@ -237,6 +237,8 @@ def train(args, model, train_dataset: VideoBertDataset, eval_dataset: VideoBertD
             if text_ids.shape[1] >= 100:
                 continue
 
+            model.zero_grad()
+
             outputs = model(
                 text_input_ids=text_ids,
                 text_token_type_ids=text_type_ids,
@@ -499,11 +501,11 @@ def main(colab_args=None):
 
     # Benchmark Evaluation
     total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
-    print("Benchmark Eval:\n"
-          "Total: {}\n"
-          "Text: {}\n"
-          "Video: {}\n"
-          "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
+    # print("Benchmark Eval:\n"
+    #       "Total: {}\n"
+    #       "Text: {}\n"
+    #       "Video: {}\n"
+    #       "Joint: {}\n".format(total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss))
 
     # Start Training
     model.train()

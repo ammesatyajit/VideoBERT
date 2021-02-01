@@ -175,14 +175,15 @@ def main(colab_args=None):
 
     # setup tokenizer and model
     tokenizer = torch.load(os.path.join(args.output_dir, "tokenizer.pt"))
+    eval_dataset = VideoBertDataset(tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
+    data_globals.config.vocab_size = len(eval_dataset.tokenizer.vocab.itos) + 20736
+    print("total vocab size of", len(eval_dataset.tokenizer.vocab.itos) + 20736)
 
     # start from checkpoint
     print('### LOADING MODEL FROM CHECKPOINT:', args.model_name_or_path, '###')
     model = VideoTransformer.from_pretrained(config=data_globals.config, args=args)
 
     model.to(args.device)
-
-    eval_dataset = VideoBertDataset(tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
 
     total_avg_loss, text_avg_loss, video_avg_loss, joint_avg_loss = evaluate(args, model, eval_dataset)
 

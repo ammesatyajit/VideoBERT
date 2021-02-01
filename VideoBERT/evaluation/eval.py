@@ -164,6 +164,8 @@ def main(colab_args=None):
             type=str,
             help="The json file for training the model"
         )
+        parser.add_argument("--per_gpu_train_batch_size", default=4, type=int,
+                            help="Batch size per GPU/CPU for training.")
         parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
         args = parser.parse_args()
 

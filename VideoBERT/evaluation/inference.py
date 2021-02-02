@@ -26,6 +26,7 @@ def set_seed(args):
 
 def text_to_video_inference(args, model, tokenizer, max_len=50):
     model.eval()
+    print(args.sentence)
     sentence = [tokenizer.vocab.stoi[token] for token in tokenizer.tokenize(args.sentence)]
     sentence.insert(0, tokenizer.vocab.stoi[tokenizer.init_token])
     sentence.append(tokenizer.vocab.stoi[tokenizer.sep_token])
@@ -47,7 +48,7 @@ def text_to_video_inference(args, model, tokenizer, max_len=50):
             break
         sentence.insert(-1, pred)
 
-    print(sentence)
+    return sentence
 
 
 def main(colab_args=None):
@@ -94,4 +95,4 @@ def main(colab_args=None):
 
     model.to(args.device)
 
-    text_to_video_inference(args, model, tokenizer)
+    print(text_to_video_inference(args, model, tokenizer))

@@ -72,7 +72,7 @@ def video_next_tok_pred(args, model, tokenizer, vid_example, max_len=50):
             break
         sentence.insert(-1, pred)
 
-    return ' '.join(sentence)
+    return sentence
 
 
 def main(colab_args=None):

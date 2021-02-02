@@ -98,7 +98,7 @@ def main(colab_args=None):
         parser.add_argument(
             "--example_id",
             default=None,
-            type=str,
+            type=int,
             help="The index of the eval set for evaluating the model"
         )
         parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")

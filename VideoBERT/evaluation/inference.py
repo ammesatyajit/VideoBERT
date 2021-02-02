@@ -31,24 +31,21 @@ def tokenize_en(text):
     return [tok.text for tok in spacy_en.tokenizer(text)]
 
 
-def text_to_video_inference(args, model, tokenizer, max_len=50):
+def text_next_tok_pred(args, model, tokenizer, sentence, max_len=50):
     model.eval()
-    sentence = [tokenizer.vocab.stoi[token] for token in tokenizer.tokenize(args.sentence)][:10]
+    sentence = sentence[:,:10]
     sentence.insert(0, tokenizer.vocab.stoi[tokenizer.init_token])
-    # sentence.append(tokenizer.vocab.stoi[tokenizer.sep_token])
     sentence.append(tokenizer.vocab.stoi[tokenizer.eos_token])
     print(sentence)
-    text_tok_type_ids = len(sentence)
     for i in range(max_len):
         inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
-        tok_type_ids = torch.hstack([torch.zeros(1, text_tok_type_ids),
-                                    torch.ones(1, len(sentence) - text_tok_type_ids)]).long().to(args.device)
+        tok_type_ids = torch.zeros_like(inp_tensor).long().to(args.device)
         attn_mask = (inp_tensor == 1).to(args.device)
         with torch.no_grad():
             output = model(
-                joint_input_ids=inp_tensor,
-                joint_token_type_ids=tok_type_ids,
-                joint_attention_mask=attn_mask,
+                text_input_ids=inp_tensor,
+                text_token_type_ids=tok_type_ids,
+                text_attention_mask=attn_mask,
             )
         pred = output[0].argmax(2)[:,-1].item()
         if pred == tokenizer.vocab.stoi[tokenizer.eos_token]:
@@ -56,6 +53,30 @@ def text_to_video_inference(args, model, tokenizer, max_len=50):
         sentence.insert(-1, pred)
 
     return ' '.join([tokenizer.vocab.itos[token] for token in sentence])
+
+
+def video_next_tok_pred(args, model, tokenizer, vid_example, max_len=50):
+    model.eval()
+    sentence = vid_example[:, :3]
+    sentence.insert(0, tokenizer.vocab.stoi[tokenizer.init_token])
+    sentence.append(tokenizer.vocab.stoi[tokenizer.eos_token])
+    print(sentence)
+    for i in range(max_len):
+        inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
+        tok_type_ids = torch.ones_like(inp_tensor).long().to(args.device)
+        attn_mask = (inp_tensor == 1).to(args.device)
+        with torch.no_grad():
+            output = model(
+                video_input_ids=inp_tensor,
+                video_token_type_ids=tok_type_ids,
+                video_attention_mask=attn_mask,
+            )
+        pred = output[0].argmax(2)[:,-1].item()
+        if pred == tokenizer.vocab.stoi[tokenizer.eos_token]:
+            break
+        sentence.insert(-1, pred)
+
+    return ' '.join(sentence)
 
 
 def main(colab_args=None):
@@ -93,6 +114,7 @@ def main(colab_args=None):
 
     # setup tokenizer and model
     tokenizer = torch.load(os.path.join(args.output_dir, "tokenizer.pt"))
+    eval_dataset = VideoBertDataset(tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
     data_globals.config.vocab_size = len(tokenizer.vocab.itos) + 20736
     print("total vocab size of", len(tokenizer.vocab.itos) + 20736)
 
@@ -102,7 +124,11 @@ def main(colab_args=None):
 
     model.to(args.device)
 
-    print(text_to_video_inference(args, model, tokenizer))
+    print("original examples")
+    print(eval_dataset[0][0], eval_dataset[0][3])
+
+    print(text_next_tok_pred(args, model, tokenizer, eval_dataset[0][0]))
+    print(video_next_tok_pred(args, model, tokenizer, eval_dataset[0][3]))
 
 
 if __name__ == "__main__":

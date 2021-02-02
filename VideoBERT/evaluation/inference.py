@@ -96,3 +96,7 @@ def main(colab_args=None):
     model.to(args.device)
 
     print(text_to_video_inference(args, model, tokenizer))
+
+
+if __name__ == "__main__":
+    main()

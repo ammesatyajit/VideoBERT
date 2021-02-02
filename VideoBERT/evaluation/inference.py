@@ -55,7 +55,7 @@ def text_to_video_inference(args, model, tokenizer, max_len=50):
             break
         sentence.insert(-1, pred)
 
-    return sentence
+    return ' '.join(sentence)
 
 
 def main(colab_args=None):

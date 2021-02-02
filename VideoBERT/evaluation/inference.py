@@ -41,8 +41,8 @@ def text_to_video_inference(args, model, tokenizer, max_len=50):
     text_tok_type_ids = len(sentence)
     for i in range(max_len):
         inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
-        tok_type_ids = torch.hstack([torch.zeros(1, text_tok_type_ids),
-                                    torch.ones(1, len(sentence) - text_tok_type_ids)]).to(args.device)
+        tok_type_ids = torch.hstack([torch.LongTensor(torch.zeros(1, text_tok_type_ids)),
+                                    torch.LongTensor(torch.ones(1, len(sentence) - text_tok_type_ids))]).to(args.device)
         print(tok_type_ids)
         attn_mask = (inp_tensor == 1).to(args.device)
         with torch.no_grad():

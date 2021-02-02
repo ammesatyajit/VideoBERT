@@ -114,7 +114,7 @@ def main(colab_args=None):
 
     # setup tokenizer and model
     tokenizer = torch.load(os.path.join(args.output_dir, "tokenizer.pt"))
-    eval_dataset = VideoBertDataset(tokenizer, build_tokenizer=False, data_path=args.eval_data_path)
+    eval_dataset = VideoBertDataset(tokenizer, build_tokenizer=False, data_path='eval_data.json')
     data_globals.config.vocab_size = len(tokenizer.vocab.itos) + 20736
     print("total vocab size of", len(tokenizer.vocab.itos) + 20736)
 

@@ -24,6 +24,13 @@ def set_seed(args):
         torch.cuda.manual_seed_all(args.seed)
 
 
+def tokenize_en(text):
+    """
+    Tokenizes English text from a string into a list of strings
+    """
+    return [tok.text for tok in spacy_en.tokenizer(text)]
+
+
 def text_to_video_inference(args, model, tokenizer, max_len=50):
     model.eval()
     print(args.sentence)

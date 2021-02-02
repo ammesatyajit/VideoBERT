@@ -33,9 +33,7 @@ def tokenize_en(text):
 
 def text_next_tok_pred(args, model, tokenizer, sentence, max_len=50):
     model.eval()
-    sentence = sentence[:,:10]
-    sentence.insert(0, tokenizer.vocab.stoi[tokenizer.init_token])
-    sentence.append(tokenizer.vocab.stoi[tokenizer.eos_token])
+    sentence = sentence[:10]
     print(sentence)
     for i in range(max_len):
         inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
@@ -57,9 +55,7 @@ def text_next_tok_pred(args, model, tokenizer, sentence, max_len=50):
 
 def video_next_tok_pred(args, model, tokenizer, vid_example, max_len=50):
     model.eval()
-    sentence = vid_example[:, :3]
-    sentence.insert(0, tokenizer.vocab.stoi[tokenizer.init_token])
-    sentence.append(tokenizer.vocab.stoi[tokenizer.eos_token])
+    sentence = vid_example[:3]
     print(sentence)
     for i in range(max_len):
         inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)

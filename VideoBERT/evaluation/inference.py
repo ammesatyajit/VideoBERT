@@ -130,9 +130,10 @@ def main(colab_args=None):
 
     print(text_next_tok_pred(args, model, tokenizer, eval_dataset[i][0]))
     out_vid_tokens = video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3])
+    print(out_vid_tokens)
 
     centroid_map = json.load(open('centroid_to_img.json', 'r'))
-    centroid_imgs = concat_tile([cv2.imread(centroid_map[str(centroid)]) for centroid in out_vid_tokens[1:-1]][:5])
+    centroid_imgs = concat_tile([cv2.imread(centroid_map[str(centroid-len(tokenizer.vocab))]) for centroid in out_vid_tokens[1:-1]][:5])
     cv2.imwrite('out-vid-{}.jpg'.format(i), centroid_imgs)
 
 

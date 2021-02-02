@@ -69,7 +69,7 @@ def video_next_tok_pred(args, model, tokenizer, vid_example, max_len=50):
                 video_token_type_ids=tok_type_ids,
                 video_attention_mask=attn_mask,
             )
-        pred = (-output[0]).argsort(axis=2)[:,:,0][:,-1].item()
+        pred = (-output[0]).argsort(axis=2)[:,:,1][:,-1].item()
         if pred == tokenizer.vocab.stoi[tokenizer.eos_token]:
             break
         sentence.insert(-1, pred)

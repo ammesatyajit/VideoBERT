@@ -1,10 +1,11 @@
 import argparse
-import logging
+import json
 import os
 import random
 
 import numpy as np
 import spacy
+import cv2
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, RandomSampler
 from tqdm import tqdm
@@ -12,6 +13,7 @@ from tqdm import tqdm
 from VideoBERT.data.VideoBertDataset import VideoBertDataset
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
 from VideoBERT.train.model_utils import *
+from VideoBERT.data.compare_quantized_data import concat_tile
 
 spacy_en = spacy.load('en')
 
@@ -127,7 +129,11 @@ def main(colab_args=None):
     print(eval_dataset[i][0], eval_dataset[i][3])
 
     print(text_next_tok_pred(args, model, tokenizer, eval_dataset[i][0]))
-    print(video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3]))
+    out_vid_tokens = video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3])
+
+    centroid_map = json.load(open('centroid_to_img.json', 'r'))
+    centroid_imgs = concat_tile([cv2.imread(centroid_map[str(centroid)]) for centroid in out_vid_tokens[1:-1]][:5])
+    cv2.imwrite('out-vid-{}.jpg'.format(i), centroid_imgs)
 
 
 if __name__ == "__main__":

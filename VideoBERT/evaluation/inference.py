@@ -33,7 +33,7 @@ def tokenize_en(text):
 
 def text_to_video_inference(args, model, tokenizer, max_len=50):
     model.eval()
-    sentence = [tokenizer.vocab.stoi[token] for token in tokenizer.tokenize(args.sentence)][:5]
+    sentence = [tokenizer.vocab.stoi[token] for token in tokenizer.tokenize(args.sentence)][:10]
     sentence.insert(0, tokenizer.vocab.stoi[tokenizer.init_token])
     # sentence.append(tokenizer.vocab.stoi[tokenizer.sep_token])
     sentence.append(tokenizer.vocab.stoi[tokenizer.eos_token])

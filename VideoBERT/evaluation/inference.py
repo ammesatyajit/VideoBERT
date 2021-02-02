@@ -96,10 +96,10 @@ def main(colab_args=None):
             help="The output directory where the checkpoint is.",
         )
         parser.add_argument(
-            "--sentence",
+            "--example_id",
             default=None,
             type=str,
-            help="The sentence for inferencing the model"
+            help="The index of the eval set for evaluating the model"
         )
         parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
         args = parser.parse_args()
@@ -123,11 +123,11 @@ def main(colab_args=None):
     model.to(args.device)
 
     print("original examples")
-    i = 50
+    i = args.example_id
     print(eval_dataset[i][0], eval_dataset[i][3])
 
-    print(text_next_tok_pred(args, model, tokenizer, eval_dataset[0][0]))
-    print(video_next_tok_pred(args, model, tokenizer, eval_dataset[0][3]))
+    print(text_next_tok_pred(args, model, tokenizer, eval_dataset[i][0]))
+    print(video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3]))
 
 
 if __name__ == "__main__":

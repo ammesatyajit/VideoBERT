@@ -60,7 +60,6 @@ def video_next_tok_pred(args, model, tokenizer, vid_example, max_len=50):
     model.eval()
     sentence = [int(token) for token in vid_example[:3]]
     sentence.append(tokenizer.vocab.stoi[tokenizer.eos_token])
-    print(sentence)
     for i in range(max_len):
         inp_tensor = torch.LongTensor(sentence).unsqueeze(0).to(args.device)
         tok_type_ids = torch.ones_like(inp_tensor).long().to(args.device)
@@ -124,17 +123,15 @@ def main(colab_args=None):
 
     model.to(args.device)
 
-    print("original examples")
     for i in tqdm(range(args.example_id, args.example_id+10000, 100)):
-        print(eval_dataset[i][0], eval_dataset[i][3])
+        try:
+            out_vid_tokens = video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3])
 
-        print(text_next_tok_pred(args, model, tokenizer, eval_dataset[i][0]))
-        out_vid_tokens = video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3])
-        print(out_vid_tokens)
-
-        centroid_map = json.load(open('centroid_to_img.json', 'r'))
-        centroid_imgs = np.concatenate([cv2.imread(centroid_map[str(centroid-len(tokenizer.vocab))]) for centroid in out_vid_tokens[1:-1]][:5], axis=0)
-        cv2.imwrite('gen_vids/out-vid-{}.jpg'.format(i), centroid_imgs)
+            centroid_map = json.load(open('centroid_to_img.json', 'r'))
+            centroid_imgs = np.concatenate([cv2.imread(centroid_map[str(centroid-len(tokenizer.vocab))]) for centroid in out_vid_tokens[1:-1]][:5], axis=0)
+            cv2.imwrite('gen_vids/out-vid-{}.jpg'.format(i), centroid_imgs)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":

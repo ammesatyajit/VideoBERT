@@ -125,16 +125,16 @@ def main(colab_args=None):
     model.to(args.device)
 
     print("original examples")
-    i = args.example_id
-    print(eval_dataset[i][0], eval_dataset[i][3])
+    for i in tqdm(range(args.example_id, args.example_id+10000, 100)):
+        print(eval_dataset[i][0], eval_dataset[i][3])
 
-    print(text_next_tok_pred(args, model, tokenizer, eval_dataset[i][0]))
-    out_vid_tokens = video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3])
-    print(out_vid_tokens)
+        print(text_next_tok_pred(args, model, tokenizer, eval_dataset[i][0]))
+        out_vid_tokens = video_next_tok_pred(args, model, tokenizer, eval_dataset[i][3])
+        print(out_vid_tokens)
 
-    centroid_map = json.load(open('centroid_to_img.json', 'r'))
-    centroid_imgs = np.concatenate([cv2.imread(centroid_map[str(centroid-len(tokenizer.vocab))]) for centroid in out_vid_tokens[1:-1]][:5], axis=0)
-    cv2.imwrite('out-vid-{}.jpg'.format(i), centroid_imgs)
+        centroid_map = json.load(open('centroid_to_img.json', 'r'))
+        centroid_imgs = np.concatenate([cv2.imread(centroid_map[str(centroid-len(tokenizer.vocab))]) for centroid in out_vid_tokens[1:-1]][:5], axis=0)
+        cv2.imwrite('gen_vids/out-vid-{}.jpg'.format(i), centroid_imgs)
 
 
 if __name__ == "__main__":

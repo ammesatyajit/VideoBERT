@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="VideoBERT", # Replace with your own username
-    version="0.0.1",
+    version="1.0.0",
     author="Satyajit Kumar",
     author_email="ammesatyajit@gmail.com",
     description="Reproducing the results of VideoBERT",
@@ -20,7 +20,10 @@ setuptools.setup(
         "tensorflow_hub",
         "opencv-python",
         "torchvision",
-        "punctuator"
+        "punctuator",
+        "torchtext",
+        "spacy",
+        "opencv-python"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

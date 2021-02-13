@@ -13,5 +13,8 @@ To find the centroids for the feature vectors, minibatch k-means is used in a hi
 # Step 4: Label and group data
 Using the centroids, videos are labelled and text captions are punctuated. Using the timestamps for each caption, video ids are extracted and paired with the text captions in the training data file. Captions can be found here: https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/
 
-# Step 5: Training (TODO)
-The training data from before is used to train a next token prediction transformer. saved model is used for evaluation and inference in the next step.
+# Step 5: Training
+The training data from before is used to train a next token prediction transformer. saved model is used for inference in the next step.
+
+# Step 6: Inference
+Model is used for predicting video sequences and results can be seen visually. Note that since the model does uses vector quantized images as tokens, it only understands the actions and approximate background of the scene, not the exact person or dish. Here are some samples:

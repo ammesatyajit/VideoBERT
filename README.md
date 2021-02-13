@@ -19,7 +19,7 @@ The training data from before is used to train a next token prediction transform
 # Step 6: Inference
 Model is used for predicting video sequences and results can be seen visually. Note that since the model does uses vector quantized images as tokens, it only understands the actions and approximate background of the scene, not the exact person or dish. Here are some samples:
 
-<p float="center", padding=5px>
+<p float="center", padding=20px>
   <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-40071.jpg" alt="out1" width="150"/>
   <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-40171.jpg" alt="out2" width="150"/>
   <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-40371.jpg" alt="out3" width="150"/>

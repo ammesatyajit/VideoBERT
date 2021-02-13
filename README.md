@@ -23,4 +23,4 @@ Model is used for predicting video sequences and results can be seen visually. N
 <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-40171.jpg" alt="out2" width="100"/>
 <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-40371.jpg" alt="out3" width="100"/>
 <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-42671.jpg" alt="out4" width="100"/>
-<img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-44471.jpg" alt="out5" width="100"/>
+<img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-44471.png" alt="out5" width="100"/>

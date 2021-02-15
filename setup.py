@@ -23,7 +23,8 @@ setuptools.setup(
         "punctuator",
         "torchtext",
         "spacy",
-        "opencv-python"
+        "opencv-python",
+        "hkmeans-minibatch"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

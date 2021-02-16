@@ -13,7 +13,7 @@ from VideoBERT.data.VideoBertDataset import VideoBertDataset
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
 from VideoBERT.train.model_utils import *
 
-spacy_en = spacy.load('en')
+spacy_en = spacy.load('en_core_web_sm')
 
 try:
     from torch.utils.tensorboard import SummaryWriter

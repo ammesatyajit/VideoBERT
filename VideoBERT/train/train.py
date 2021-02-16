@@ -23,7 +23,7 @@ from transformers import (
     get_linear_schedule_with_warmup,
 )
 
-spacy_en = spacy.load('en')
+spacy_en = spacy.load('en_core_web_sm')
 
 try:
     from torch.utils.tensorboard import SummaryWriter

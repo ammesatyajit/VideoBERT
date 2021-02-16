@@ -382,18 +382,6 @@ def main(colab_args=None):
             help="Optional pretrained config name or path if not the same as model_name_or_path. If both are None, initialize a new config.",
         )
         parser.add_argument(
-            "--tokenizer_name",
-            default=None,
-            type=str,
-            help="Optional pretrained tokenizer name or path if not the same as model_name_or_path. If both are None, initialize a new tokenizer.",
-        )
-        parser.add_argument(
-            "--cache_dir",
-            default=None,
-            type=str,
-            help="Optional directory to store the pre-trained models downloaded from s3 (instead of the default one)",
-        )
-        parser.add_argument(
             "--block_size",
             default=-1,
             type=int,

@@ -1,13 +1,26 @@
 import numpy as np
 import torch
+import argparse
 from tqdm import tqdm
 import os
 import json
 
-saved_features = 'saved_features'
-saved_imgs = 'saved_imgs'
-centroids = np.load('centroids.npy')
-save_path = 'centroid_to_img.json'
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-f', '--root-features', type=str, required=True,
+                    help='path to folder containing all the video folders with the features')
+parser.add_argument('-i', '--root-imgs', type=str, required=True,
+                    help='path to folder containing all the video folders with the images corresponding to the features')
+parser.add_argument('-c', '--centroid-file', type=str, required=True,
+                    help='the .npy file containing all the centroids')
+parser.add_argument('-s', '--save-file', type=str, required=True,
+                    help='json file to save the centroid to image dictionary in')
+args = parser.parse_args()
+
+saved_features = args.root_features
+saved_imgs = args.root_imgs
+centroids = np.load(args.centroid_file)
+save_path = args.save_file
 centroid_map = {}
 
 feature_paths = {}

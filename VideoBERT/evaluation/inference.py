@@ -6,16 +6,13 @@ import random
 import numpy as np
 import spacy
 import cv2
-from torch.nn.utils.rnn import pad_sequence
-from torch.utils.data import DataLoader, RandomSampler
 from tqdm import tqdm
 
 from VideoBERT.data.VideoBertDataset import VideoBertDataset
 from VideoBERT.train.custom_vid_transformer import VideoTransformer
 from VideoBERT.train.model_utils import *
-from VideoBERT.data.compare_quantized_data import concat_tile
 
-spacy_en = spacy.load('en')
+spacy_en = spacy.load('en_core_web_sm')
 
 
 def set_seed(args):

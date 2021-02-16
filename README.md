@@ -48,11 +48,38 @@ Note that after this step the centroids will need to be concatenated for ease of
 
 After doing kmeans, the image representing each centroid needs to be found to display the video during inference.
 ```
-$ python3 VideoBERT/VideoBERT/data/centroid_to_img.py
+$ python3 VideoBERT/VideoBERT/data/centroid_to_img.py -h 
+usage: centroid_to_img.py [-h] -f ROOT_FEATURES -i ROOT_IMGS -c CENTROID_FILE -s SAVE_FILE
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f ROOT_FEATURES, --root-features ROOT_FEATURES
+                        path to folder containing all the video folders with the features
+  -i ROOT_IMGS, --root-imgs ROOT_IMGS
+                        path to folder containing all the video folders with the images corresponding to the features
+  -c CENTROID_FILE, --centroid-file CENTROID_FILE
+                        the .npy file containing all the centroids
+  -s SAVE_FILE, --save-file SAVE_FILE
+                        json file to save the centroid to image dictionary in
 ```
 
 # Step 4: Label and group data
-Using the centroids, videos are labelled and text captions are punctuated. Using the timestamps for each caption, video ids are extracted and paired with the text captions in the training data file. Captions can be found here: https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/
+Using the centroids, videos are tokenized and text captions are punctuated. Using the timestamps for each caption, video ids are extracted and paired with the text captions in the training data file. Captions can be found here: https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/. 
+
+The python file below tokenizes the videos:
+```
+$ python3 VideoBERT/VideoBERT/data/label_data.py -h     
+usage: label_data.py [-h] -f ROOT_FEATURES -c CENTROID_FILE -s SAVE_FILE
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f ROOT_FEATURES, --root-features ROOT_FEATURES
+                        path to folder containing all the video folders with the features
+  -c CENTROID_FILE, --centroid-file CENTROID_FILE
+                        the .npy file containing all the centroids
+  -s SAVE_FILE, --save-file SAVE_FILE
+                        json file to save the labelled data to
+```
 
 # Step 5: Training
 The training data from before is used to train a next token prediction transformer. saved model is used for inference in the next step.

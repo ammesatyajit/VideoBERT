@@ -81,8 +81,28 @@ optional arguments:
                         json file to save the labelled data to
 ```
 
+After that the following file can be run to both punctuate text and group the text with the corresponding video. This uses the Punctuator module, which requires a .pcl model file to punctuate the data. 
+```
+$ python3 VideoBERT/VideoBERT/data/punctuate_text.py -h 
+usage: punctuate_text.py [-h] -c CAPTIONS_PATH -p PUNCTUATOR_MODEL -l LABELLED_DATA -f ROOT_FEATURES -s SAVE_PATH
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CAPTIONS_PATH, --captions-path CAPTIONS_PATH
+                        path to filtered captions
+  -p PUNCTUATOR_MODEL, --punctuator-model PUNCTUATOR_MODEL
+                        path to punctuator .pcl model
+  -l LABELLED_DATA, --labelled-data LABELLED_DATA
+                        path to labelled data json file
+  -f ROOT_FEATURES, --root-features ROOT_FEATURES
+                        directory with all the video features
+  -s SAVE_PATH, --save-path SAVE_PATH
+                        json file to save training data to
+```
+If desired, an evaluation data file can be created by splitting the training data file.
+
 # Step 5: Training
-The training data from before is used to train a next token prediction transformer. saved model is used for inference in the next step.
+The training data from before is used to train a next token prediction transformer. The saved model is used for inference in the next step.
 
 # Step 6: Inference
 Model is used for predicting video sequences and results can be seen visually. Note that since the model does uses vector quantized images as tokens, it only understands the actions and approximate background of the scene, not the exact person or dish. Here are some samples:

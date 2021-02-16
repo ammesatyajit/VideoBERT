@@ -102,7 +102,63 @@ optional arguments:
 If desired, an evaluation data file can be created by splitting the training data file.
 
 # Step 5: Training
-The training data from before is used to train a next token prediction transformer. The saved model is used for inference in the next step.
+The training data from before is used to train a next token prediction transformer. The saved model and tokenizer is used for inference in the next step. here is the usage of the train.py file.
+
+```
+$ python3 VideoBERT/VideoBERT/train/train.py -h
+usage: train.py [-h] --output_dir OUTPUT_DIR [--should_continue] [--model_name_or_path MODEL_NAME_OR_PATH] [--train_data_path TRAIN_DATA_PATH] [--eval_data_path EVAL_DATA_PATH] [--config_name CONFIG_NAME] [--block_size BLOCK_SIZE]
+                [--per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE] [--gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS] [--learning_rate LEARNING_RATE] [--weight_decay WEIGHT_DECAY] [--adam_epsilon ADAM_EPSILON]
+                [--max_grad_norm MAX_GRAD_NORM] [--num_train_epochs NUM_TRAIN_EPOCHS] [--max_steps MAX_STEPS] [--log_dir LOG_DIR] [--warmup_steps WARMUP_STEPS] [--local_rank LOCAL_RANK] [--logging_steps LOGGING_STEPS]
+                [--save_steps SAVE_STEPS] [--save_total_limit SAVE_TOTAL_LIMIT] [--overwrite_output_dir] [--overwrite_cache] [--seed SEED]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --output_dir OUTPUT_DIR
+                        The output directory where the model predictions and checkpoints will be written.
+  --should_continue     Whether to continue from latest checkpoint in output_dir
+  --model_name_or_path MODEL_NAME_OR_PATH
+                        The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.
+  --train_data_path TRAIN_DATA_PATH
+                        The json file for training the model
+  --eval_data_path EVAL_DATA_PATH
+                        The json file for evaluating the model
+  --config_name CONFIG_NAME
+                        Optional pretrained config name or path if not the same as model_name_or_path. If both are None, initialize a new config.
+  --block_size BLOCK_SIZE
+                        Optional input sequence length after tokenization.The training dataset will be truncated in block of this size for training.Default to the model max input length for single sentence inputs (take into account
+                        special tokens).
+  --per_gpu_train_batch_size PER_GPU_TRAIN_BATCH_SIZE
+                        Batch size per GPU/CPU for training.
+  --gradient_accumulation_steps GRADIENT_ACCUMULATION_STEPS
+                        Number of updates steps to accumulate before performing a backward/update pass.
+  --learning_rate LEARNING_RATE
+                        The initial learning rate for Adam.
+  --weight_decay WEIGHT_DECAY
+                        Weight decay if we apply some.
+  --adam_epsilon ADAM_EPSILON
+                        Epsilon for Adam optimizer.
+  --max_grad_norm MAX_GRAD_NORM
+                        Max gradient norm.
+  --num_train_epochs NUM_TRAIN_EPOCHS
+                        Total number of training epochs to perform.
+  --max_steps MAX_STEPS
+                        If > 0: set total number of training steps to perform. Override num_train_epochs.
+  --log_dir LOG_DIR     Directory to store the logs.
+  --warmup_steps WARMUP_STEPS
+                        Linear warmup over warmup_steps.
+  --local_rank LOCAL_RANK
+                        For distributed training: local_rank
+  --logging_steps LOGGING_STEPS
+                        Log every X updates steps.
+  --save_steps SAVE_STEPS
+                        Save checkpoint every X updates steps.
+  --save_total_limit SAVE_TOTAL_LIMIT
+                        Limit the total amount of checkpoints, delete the older checkpoints in the output_dir, does not delete by default
+  --overwrite_output_dir
+                        Overwrite the content of the output directory
+  --overwrite_cache     Overwrite the cached training and evaluation sets
+  --seed SEED           random seed for initialization
+```
 
 # Step 6: Inference
 Model is used for predicting video sequences and results can be seen visually. Note that since the model does uses vector quantized images as tokens, it only understands the actions and approximate background of the scene, not the exact person or dish. Here are some samples:
@@ -114,3 +170,20 @@ Model is used for predicting video sequences and results can be seen visually. N
   <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-42671.jpg" alt="out4" width="150"/>
   <img src="https://github.com/ammesatyajit/videobert/blob/master/results/out-vid-44471.png" alt="out5" width="150"/>
 </p>
+
+Here is the usage for the inference file. Feel free to modify it to suit any specific needs:
+
+```
+$ python3 VideoBERT/VideoBERT/evaluation/inference.py -h 
+usage: inference.py [-h] [--model_name_or_path MODEL_NAME_OR_PATH] --output_dir OUTPUT_DIR [--example_id EXAMPLE_ID] [--seed SEED]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --model_name_or_path MODEL_NAME_OR_PATH
+                        The model checkpoint for weights initialization. Leave None if you want to train a model from scratch.
+  --output_dir OUTPUT_DIR
+                        The output directory where the checkpoint is.
+  --example_id EXAMPLE_ID
+                        The index of the eval set for evaluating the model
+  --seed SEED           random seed for initialization
+```

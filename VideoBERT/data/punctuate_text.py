@@ -7,15 +7,23 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--captions-path', type=str, required=True,
                     help='path to filtered captions')
+parser.add_argument('-p', '--punctuator-model', type=str, required=True,
+                    help='path to punctuator .pcl model')
+parser.add_argument('-l', '--labelled-data', type=str, required=True,
+                    help='path to labelled data json file')
+parser.add_argument('-f', '--root-features', type=str, required=True,
+                    help='directory with all the video features')
+parser.add_argument('-s', '--save-path', type=str, required=True,
+                    help='json file to save training data to')
 args = parser.parse_args()
 
 captions_path = args.captions_path
-save_path = 'training_data.json'
+save_path = args.save_path
 
-punc = Punctuator('model.pcl')
+punc = Punctuator(args.punctuator_model)
 captions = json.load(open(captions_path, 'r'))
-labelled_data = json.load(open('labelled_data.json', 'r'))
-vid_ids = os.listdir('saved_features')
+labelled_data = json.load(open(args.labelled_data, 'r'))
+vid_ids = os.listdir(args.root_features)
 
 start = 0
 if os.path.exists(save_path):

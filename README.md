@@ -9,7 +9,6 @@ The I3D model is used to extract the features for every 1.5 seconds of video whi
 
 ```
 $ python3 VideoBERT/VideoBERT/I3D/batch_extract.py -h
-
 usage: batch_extract.py [-h] -f FILE_LIST_PATH -r ROOT_VIDEO_PATH -s FEATURES_SAVE_PATH -i IMGS_SAVE_PATH
 
 optional arguments:
@@ -25,7 +24,32 @@ optional arguments:
 ```
 
 # Step 3: Hierarchical Minibatch K-means
-To find the centroids for the feature vectors, minibatch k-means is used in a hierarchy to save time and memory. After this, the nearest feature vector for each centroid is found, and the corresponding image is chosen to represent tht centroid.
+To find the centroids for the feature vectors, minibatch k-means is used hierarchically to save time and memory. After this, the nearest feature vector for each centroid is found, and the corresponding image is chosen to represent tht centroid. To use the hierarchical minibatch k-means independently for another project, consider using the python package hkmeans-minibatch, which is also used in this VideoBERT project (https://github.com/ammesatyajit/hierarchical-minibatch-kmeans).
+
+Here is the usage for the kmeans code:
+```
+$ python3 VideoBERT/VideoBERT/I3D/minibatch_hkmeans.py -h 
+usage: minibatch_hkmeans.py [-h] -r ROOT_FEATURE_PATH -p FEATURES_PREFIX [-b BATCH_SIZE] -s SAVE_DIR -c CENTROID_DIR
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -r ROOT_FEATURE_PATH, --root-feature_path ROOT_FEATURE_PATH
+                        path to folder containing all the video folders with the features
+  -p FEATURES_PREFIX, --features-prefix FEATURES_PREFIX
+                        prefix that is common between the desired files to read
+  -b BATCH_SIZE, --batch-size BATCH_SIZE
+                        batch_size to use for the minibatch kmeans
+  -s SAVE_DIR, --save-dir SAVE_DIR
+                        save directory for hierarchical kmeans vectors
+  -c CENTROID_DIR, --centroid-dir CENTROID_DIR
+                        directory to save the centroids in
+```
+Note that after this step the centroids will need to be concatenated for ease of use.
+
+After doing kmeans, the image representing each centroid needs to be found to display the video during inference.
+```
+$ python3 VideoBERT/VideoBERT/data/centroid_to_img.py
+```
 
 # Step 4: Label and group data
 Using the centroids, videos are labelled and text captions are punctuated. Using the timestamps for each caption, video ids are extracted and paired with the text captions in the training data file. Captions can be found here: https://www.rocq.inria.fr/cluster-willow/amiech/howto100m/

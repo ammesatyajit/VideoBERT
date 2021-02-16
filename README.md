@@ -1,11 +1,28 @@
 # VideoBERT
-This repo reproduces the results of VideoBERT. Here are all the steps taken so far below:
+This repo reproduces the results of VideoBERT (https://arxiv.org/pdf/1904.01766.pdf). Inspiration was taken from https://github.com/MDSKUL/MasterProject, but this repo tackles video prediction rather than captioning and masked language modeling. Here are all the steps taken:
 
 # Step 1: Download 47k videos from the HowTo100M dataset
-Using the HowTo100M dataset https://www.di.ens.fr/willow/research/howto100m/, filter out the cooking videos and download them for feature extraction. The dataset is also used for finding images for each feature vector.
+Using the HowTo100M dataset https://www.di.ens.fr/willow/research/howto100m/, filter out the cooking videos and download them for feature extraction. The dataset is also used for extracting images for each feature vector. The ids for the videos are contained in the ids.txt file. 
 
 # Step 2: Do feature extraction with the I3D model
-The I3D model is used to extract the features for every 1.5 seconds of video while saving the median image of the 1.5 seconds of video as well. I3D model used: https://tfhub.dev/deepmind/i3d-kinetics-600/1
+The I3D model is used to extract the features for every 1.5 seconds of video while saving the median image of the 1.5 seconds of video as well. I3D model used: https://tfhub.dev/deepmind/i3d-kinetics-600/1. Note that CUDA should be used to decrease the runtime. Here is the usage for the code to run:
+
+```
+$ python3 VideoBERT/VideoBERT/I3D/batch_extract.py -h
+
+usage: batch_extract.py [-h] -f FILE_LIST_PATH -r ROOT_VIDEO_PATH -s FEATURES_SAVE_PATH -i IMGS_SAVE_PATH
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FILE_LIST_PATH, --file-list-path FILE_LIST_PATH
+                        path to file containing video file names
+  -r ROOT_VIDEO_PATH, --root-video-path ROOT_VIDEO_PATH
+                        root directory containing video files
+  -s FEATURES_SAVE_PATH, --features-save-path FEATURES_SAVE_PATH
+                        directory in which to save features
+  -i IMGS_SAVE_PATH, --imgs-save-path IMGS_SAVE_PATH
+                        directory in which to save images
+```
 
 # Step 3: Hierarchical Minibatch K-means
 To find the centroids for the feature vectors, minibatch k-means is used in a hierarchy to save time and memory. After this, the nearest feature vector for each centroid is found, and the corresponding image is chosen to represent tht centroid.

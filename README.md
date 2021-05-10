@@ -1,5 +1,5 @@
 # VideoBERT
-This repo reproduces the results of VideoBERT (https://arxiv.org/pdf/1904.01766.pdf). Inspiration was taken from https://github.com/MDSKUL/MasterProject, but this repo tackles video prediction rather than captioning and masked language modeling. Here are all the steps taken:
+This repo reproduces the results of VideoBERT (https://arxiv.org/pdf/1904.01766.pdf). Inspiration was taken from https://github.com/MDSKUL/MasterProject, but this repo tackles video prediction rather than captioning and masked language modeling. On a side note, since this model is extremely small, the results that are displayed here are extremely basic. Feel free to increase the model size per your computational resources and change the inference file to include temperature if necessary (As of now I have not implemented temperature). Here are all the steps taken:
 
 # Step 1: Download 47k videos from the HowTo100M dataset
 Using the HowTo100M dataset https://www.di.ens.fr/willow/research/howto100m/, filter out the cooking videos and download them for feature extraction. The dataset is also used for extracting images for each feature vector. The ids for the videos are contained in the ids.txt file. 
